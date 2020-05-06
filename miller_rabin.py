@@ -1,6 +1,6 @@
+import random
 import numpy as np
 from wheel_sieve_byte import PRIME_GEN
-import pdb
 
 
 def powmod(x, r, n):
@@ -26,17 +26,27 @@ def powmod(x, r, n):
 
 def witness_uniform(n, k):
     """Choose k distinct numbers from the range [2, n-2] with equal weights.
+       Assuming k << n for large n. Fails when k >= sqrt(n) and n above int64 range, which is not practal anyways.
 
     Args:
         n (int): Number determining the range, n >= 4
-        k (int): Number of elements to be selected, k <= n - 3
+        k (int): Number of elements to be selected, 1 <= k <= n - 3
 
     Returns:
         list of int: List of chosen numbers
     """
     assert n >= 4
-    assert k <= n - 3
-    return np.random.choice(n - 3, k, replace=False) + 2
+    assert 1 <= k <= n - 3
+    if k < int(n ** 0.5):
+        s = set()
+        r = random.randint(2, n - 2)
+        while len(s) < k:
+            while r in s:
+                r = random.randint(2, n - 2)
+            s.add(r)
+        return list(s)
+    else:
+        return random.sample(range(2, n - 2 + 1), k)
 
 
 def witness_prime(ubound):
@@ -111,12 +121,8 @@ def probable_primes(n, d, ubound, witness_list):
 
 
 if __name__ == "__main__":
-    np.random.seed(2)
-    n = 3 * 2 ** 2046
-    for i, v in enumerate(np.random.randint(2**32, size=(2046 // 32))):
-        n += v * 2 ** (i * 32)
-    n += np.random.randint(2**(2046 % 32)) * 2 ** (2046 // 32 * 32)
+    random.seed(2)
     d = 10000
-
-    for v in probable_primes(n - d, d, 3000, witness_prime(1000)):
+    n = random.randint(3 * 2**2046, 2**2048 - d - 1)
+    for v in probable_primes(n, d, 3000, witness_prime(1000)):
         print(v)
