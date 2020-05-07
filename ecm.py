@@ -196,7 +196,7 @@ def ecm(n, rounds, b1, b2):
     For each round:
         0. Generate random point and curve.
         1. Repeatedly multiply the current point by small primes raised to some power, determined by b1.
-        2. Repeatedly try to multiply the point from step 1 by possible primes (with wheel of 30) between b1 and b2.
+        2. Repeatedly try to multiply the point from step 1 by possible primes (with wheel of 210) between b1 and b2.
     Returns when a non-trivial factor is found.
 
     Args:
@@ -233,25 +233,37 @@ def ecm(n, rounds, b1, b2):
                 pt = mul_pt_exn(pt, curve, k)
             # Step 2
             q = pt
-            mq = mul_pt(q, curve, 30)
+            mq = mul_pt(q, curve, 210)
             jq_list = []
-            for j in [1, 7, 11, 13]:
+            for j in [1, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59,
+                      61, 67, 71, 73, 79, 83, 89, 97, 101, 103]:
                 jq = mul_pt(q, curve, j)
                 jq_list.append(jq)
                 res = gcd(jq[1], n)
                 if 1 < res < n:
                     return res
-            c = (b1 // 30) * 30
+            c = (b1 // 210) * 210
             cq = mul_pt(q, curve, c)
-            while c < b2 + 30:
+            while c < b2 + 210:
                 s = cq[1] if cq[1] != 0 else 1
                 for jq in jq_list:
                     if cq[0] != jq[0]:
-                        s *= cq[0] - jq[0]
+                        s = s * (cq[0] - jq[0]) % n
                 res = gcd(s, n)
                 if 1 < res < n:
                     return res
-                c += 30
+                elif res == n:
+                    res = gcd(cq[1], n)
+                    if 1 < res < n:
+                        return res
+                    for jq in jq_list:
+                        res = gcd(cq[0] - jq[0], n)
+                        if 1 < res < n:
+                            return res
+                    # s is a multiple of n while each of cq[1] and {(cq[0] - jq[0]) % n} is not.
+                    # There must be at least 2 non-trivial factors. The function should have returned.
+                    assert False
+                c += 210
                 cq = add_pt_exn(cq, mq, curve)
         except InverseNotFound as e:
             res = gcd(e.x, n)
@@ -263,4 +275,4 @@ def ecm(n, rounds, b1, b2):
 if __name__ == "__main__":
     random.seed(2)
     n = 10648244288842058842742264007469181  # (103190330403778789 * 103190330403788729)
-    print(ecm(n, 100, 10000, 300000))
+    print(ecm(n, 100, 10000, 800000))
