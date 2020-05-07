@@ -1,6 +1,6 @@
 import random
 import numpy as np
-from wheel_sieve_byte import PRIME_GEN, wheel_sieve
+from wheel_sieve_byte import PRIME_GEN
 
 
 class InverseNotFound(Exception):
@@ -191,7 +191,7 @@ def mul_pt(point, curve, k):
     return res
 
 
-def ecm(n, rounds, b1, b2, use_prime_list=False):
+def ecm(n, rounds, b1, b2):
     """Elliptic Curve Factorization Method.
     For each round:
         0. Generate random point and curve.
@@ -204,7 +204,6 @@ def ecm(n, rounds, b1, b2, use_prime_list=False):
         rounds (int): Number of random curves to try.
         b1 (int): Bound for primes used in step 1.
         b2 (int): Bound for primes searched for in step 2. b1 < b2.
-        use_prime_list (bool, optional): Keep a list of primes from b1 to b2 in memory for step 2. Defaults to False.
 
     Returns:
         int: Non-trivial factor if found, otherwise returns None.
@@ -212,7 +211,6 @@ def ecm(n, rounds, b1, b2, use_prime_list=False):
     k_ls = []
     for p in PRIME_GEN(b1):
         k_ls.append(p ** int(np.log(b1) / np.log(p)))
-    p_ls = list(wheel_sieve(b1, b2)) if use_prime_list else []
     for roundi in range(rounds):
         print("Round {}...".format(roundi))
         count = 0
@@ -236,31 +234,25 @@ def ecm(n, rounds, b1, b2, use_prime_list=False):
             # Step 2
             q = pt
             mq = mul_pt(q, curve, 30)
-            jq_list = [(1, q), (29, neg_pt(q, curve))]
-            for j in [7, 11, 13]:
-                x = mul_pt(q, curve, j)
-                jq_list.append((j, x))
-                jq_list.append((30 - j, neg_pt(x, curve)))
-            jq_list.sort()
+            jq_list = []
+            for j in [1, 7, 11, 13]:
+                jq = mul_pt(q, curve, j)
+                jq_list.append(jq)
+                res = gcd(jq[1], n)
+                if 1 < res < n:
+                    return res
             c = (b1 // 30) * 30
             cq = mul_pt(q, curve, c)
-            if use_prime_list:
-                p_idx = 0
-                while c < b2:
-                    if p_idx < len(p_ls) and p_ls[p_idx] < c + 30:
-                        for j, jq in jq_list:
-                            if p_idx < len(p_ls) and p_ls[p_idx] == c + j:
-                                add_pt_exn(cq, jq, curve)
-                                p_idx += 1
-                    c += 30
-                    cq = add_pt_exn(cq, mq, curve)
-                assert p_idx == len(p_ls)
-            else:
-                while c < b2:
-                    for j, jq in jq_list:
-                        add_pt_exn(cq, jq, curve)
-                    c += 30
-                    cq = add_pt_exn(cq, mq, curve)
+            while c < b2 + 30:
+                s = cq[1] if cq[1] != 0 else 1
+                for jq in jq_list:
+                    if cq[0] != jq[0]:
+                        s *= cq[0] - jq[0]
+                res = gcd(s, n)
+                if 1 < res < n:
+                    return res
+                c += 30
+                cq = add_pt_exn(cq, mq, curve)
         except InverseNotFound as e:
             res = gcd(e.x, n)
             if 1 < res < n:
@@ -271,4 +263,4 @@ def ecm(n, rounds, b1, b2, use_prime_list=False):
 if __name__ == "__main__":
     random.seed(2)
     n = 10648244288842058842742264007469181  # (103190330403778789 * 103190330403788729)
-    print(ecm(n, 100, 10000, 100000, use_prime_list=True))
+    print(ecm(n, 100, 10000, 300000))
