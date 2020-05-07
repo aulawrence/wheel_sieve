@@ -40,18 +40,15 @@ def inv(x, n):
     """
     a = x % n
     b = n
-    sb = 1
     tb = 0
-    sa = 0
     ta = 1
     while a > 0:
         (q, a), b = divmod(b, a), a
-        sa, sb = sb - q * sa, sa
         ta, tb = tb - q * ta, ta
-    assert sb * n + tb * (x % n) == b
+    assert tb * x % n == b
     if b != 1:
         raise InverseNotFound(x % n, n)
-    return (tb % n + n) % n
+    return tb % n
 
 
 def get_curve(pt0, a, n):
@@ -275,4 +272,4 @@ def ecm(n, rounds, b1, b2):
 if __name__ == "__main__":
     random.seed(2)
     n = 10648244288842058842742264007469181  # (103190330403778789 * 103190330403788729)
-    print(ecm(n, 100, 10000, 800000))
+    print(ecm(n, 1, 10000, 800000))
