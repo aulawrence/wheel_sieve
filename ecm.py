@@ -233,17 +233,17 @@ def ecm(n, rounds, b1, b2):
                 pt = mul_pt_exn(pt, curve, k)
             # Step 2
             q = pt
-            mq = mul_pt(q, curve, 210)
+            mq = mul_pt_exn(q, curve, 210)
             jq_list = []
             for j in [1, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59,
                       61, 67, 71, 73, 79, 83, 89, 97, 101, 103]:
-                jq = mul_pt(q, curve, j)
+                jq = mul_pt_exn(q, curve, j)
                 jq_list.append(jq)
                 res = gcd(jq[1], n)
                 if 1 < res < n:
                     return res
             c = (b1 // 210) * 210
-            cq = mul_pt(q, curve, c)
+            cq = mul_pt_exn(q, curve, c)
             while c < b2 + 210:
                 s = cq[1] if cq[1] != 0 else 1
                 for jq in jq_list:
