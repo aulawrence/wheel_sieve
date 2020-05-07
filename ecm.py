@@ -210,7 +210,7 @@ def ecm(n, rounds, b1, b2):
     """
     k_ls = []
     for p in PRIME_GEN(b1):
-        k_ls.append(p ** int(np.log(b1) / np.log(p)))
+        k_ls.append(p ** int(round(np.log(b1) / np.log(p))))
     for roundi in range(rounds):
         print("Round {}...".format(roundi))
         count = 0
