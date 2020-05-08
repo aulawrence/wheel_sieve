@@ -159,6 +159,8 @@ def mul_pt_exn(point, curve, k):
     Returns:
         tuple(int, int): Point k * point.
     """
+    if k < 0:
+        return mul_pt_exn(neg_pt(point, curve), curve, -k)
     res = (None, None)
     while k >= 1:
         if k % 2 == 1:
@@ -179,6 +181,8 @@ def mul_pt(point, curve, k):
     Returns:
         tuple(int, int): Point k * point. Returns (None, None) for point at infinity.
     """
+    if k < 0:
+        return mul_pt(neg_pt(point, curve), curve, -k)
     res = (None, None)
     while k >= 1:
         if k % 2 == 1:
@@ -272,4 +276,4 @@ def ecm(n, rounds, b1, b2):
 if __name__ == "__main__":
     random.seed(2)
     n = 10648244288842058842742264007469181  # (103190330403778789 * 103190330403788729)
-    print(ecm(n, 1, 10000, 800000))
+    print(ecm(n, 100, 10000, 800000))
