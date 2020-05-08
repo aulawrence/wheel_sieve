@@ -1,5 +1,6 @@
 import random
 import numpy as np
+from math import gcd
 from wheel_sieve_byte import PRIME_GEN
 
 
@@ -15,14 +16,6 @@ class InverseNotFound(Exception):
         super(InverseNotFound, self).__init__("Inverse of {0:d} (mod {1:d}) not found.".format(x, n))
         self.x = x
         self.n = n
-
-
-def gcd(a, b):
-    a = abs(a)
-    b = abs(b)
-    while a > 0:
-        a, b = b % a, a
-    return b
 
 
 def inv(x, n):
@@ -128,23 +121,6 @@ def add_pt_exn(pt1, pt2, curve):
     return (xr, yr)
 
 
-def add_pt(pt1, pt2, curve):
-    """Adds two points pt1 and pt2 on curve.
-
-    Args:
-        pt1 (tuple(int, int)): Point (x1, y1). Use (None, None) for point at infinity.
-        pt2 (tuple(int, int)): Point (x2, y2). Use (None, None) for point at infinity.
-        curve (tuple(int, int, int)): (a, b, n) representing the Elliptic Curve y**2 = x**3 + a*x + b (mod n).
-
-    Returns:
-        tuple(int, int): Point pt1 + pt2.
-    """
-    try:
-        return add_pt_exn(pt1, pt2, curve)
-    except InverseNotFound:
-        return (None, None)
-
-
 def mul_pt_exn(point, curve, k):
     """Multiplies point by k times on curve.
 
@@ -167,28 +143,6 @@ def mul_pt_exn(point, curve, k):
             res = add_pt_exn(res, point, curve)
         k //= 2
         point = add_pt_exn(point, point, curve)
-    return res
-
-
-def mul_pt(point, curve, k):
-    """Multiplies point by k times on curve.
-
-    Args:
-        point (tuple(int, int)): Point (x, y). Use (None, None) for point at infinity.
-        curve (tuple(int, int, int)): (a, b, n) representing the Elliptic Curve y**2 = x**3 + a*x + b (mod n).
-        k (int): Multiplier.
-
-    Returns:
-        tuple(int, int): Point k * point. Returns (None, None) for point at infinity.
-    """
-    if k < 0:
-        return mul_pt(neg_pt(point, curve), curve, -k)
-    res = (None, None)
-    while k >= 1:
-        if k % 2 == 1:
-            res = add_pt(res, point, curve)
-        k //= 2
-        point = add_pt(point, point, curve)
     return res
 
 
@@ -230,22 +184,24 @@ def ecm(n, rounds, b1, b2):
             return delta
         try:
             # Step 1
+            print(" - Step 1")
             for k in k_ls:
                 pt = mul_pt_exn(pt, curve, k)
             # Step 2
+            print(" - Step 2")
             q = pt
-            mq = mul_pt_exn(q, curve, 210)
+            wheel = 210
+            mq = mul_pt_exn(q, curve, wheel)
             jq_list = []
-            for j in [1, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59,
-                      61, 67, 71, 73, 79, 83, 89, 97, 101, 103]:
+            for j in [k for k in range(1, wheel // 2) if gcd(k, wheel) == 1]:
                 jq = mul_pt_exn(q, curve, j)
                 jq_list.append(jq)
                 res = gcd(jq[1], n)
                 if 1 < res < n:
                     return res
-            c = (b1 // 210) * 210
+            c = (b1 // wheel) * wheel
             cq = mul_pt_exn(q, curve, c)
-            while c < b2 + 210:
+            while c < b2 + wheel:
                 s = cq[1] if cq[1] != 0 else 1
                 for jq in jq_list:
                     if cq[0] != jq[0]:
@@ -264,7 +220,7 @@ def ecm(n, rounds, b1, b2):
                     # s is a multiple of n while each of cq[1] and {(cq[0] - jq[0]) % n} is not.
                     # There must be at least 2 non-trivial factors. The function should have returned.
                     assert False
-                c += 210
+                c += wheel
                 cq = add_pt_exn(cq, mq, curve)
         except InverseNotFound as e:
             res = gcd(e.x, n)
@@ -275,5 +231,5 @@ def ecm(n, rounds, b1, b2):
 
 if __name__ == "__main__":
     random.seed(2)
-    n = 10648244288842058842742264007469181  # (103190330403778789 * 103190330403788729)
+    n = 310739457793333465418548557523014289  # (413198756866051421 * 752033864163021509)
     print(ecm(n, 100, 10000, 800000))

@@ -1,9 +1,4 @@
-def gcd(a, b):
-    a = abs(a)
-    b = abs(b)
-    while a > 0:
-        a, b = b % a, a
-    return b
+from math import gcd
 
 
 def pollard(x0, g, n):
@@ -78,7 +73,7 @@ def pollard2(x0, g, n):
 
 
 if __name__ == "__main__":
-    n = 10648244288842058842742264007469181  # (103190330403778789 * 103190330403788729)
+    n = 3176919178044924099992905369  # (41610855623299 * 76348326186931)
     x = 2
 
     def g(x):
