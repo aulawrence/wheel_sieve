@@ -38,7 +38,7 @@ def inv(x, n):
     while a > 0:
         (q, a), b = divmod(b, a), a
         ta, tb = tb - q * ta, ta
-    assert tb * x % n == b
+    assert (tb * x - b) % n == 0
     if b != 1:
         raise InverseNotFound(x % n, n)
     return tb % n
