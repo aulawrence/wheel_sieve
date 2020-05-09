@@ -194,7 +194,7 @@ def mul_pt(pt, curve, k):
 
 
 def check(pt, curve):
-    """Given point P (x, z), check that gcd(z, n) == 1 and return P.
+    """Given point P (x, z), check that P is not the point at infinity, i.e. gcd(z, n) == 1, and return P.
        If gcd(z, n) > 1, throws InverseNotFound.
 
     Args:
@@ -202,7 +202,7 @@ def check(pt, curve):
         curve (tuple(int, int, int)): Curve.
 
     Raises:
-        InverseNotFound: Thrown when z 
+        InverseNotFound: Thrown when point P is the point at infinity.
 
     Returns:
         tuple(int, int): Point P.
