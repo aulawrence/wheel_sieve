@@ -119,6 +119,7 @@ def get_curve_a(x, A, n):
 
 def add_pt(ptp, ptq, pt_, curve):
     """Computes point P+Q given points P, Q and P-Q, and curve.
+       Does not return correct result when P == Q, use dbl_pt instead.
 
     Args:
         ptp (tuple(int, int)): Point P.
