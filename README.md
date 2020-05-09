@@ -16,11 +16,11 @@ Python 3.5+
 numpy
 ```
 
-## Useful Links
+## Referenced Links
 
-### Elliptic Curve
+### Elliptic Curve Method
 - https://en.wikipedia.org/wiki/Lenstra_elliptic-curve_factorization
-- https://www.rieselprime.de/ziki/Elliptic_curve_method#Formulas_for_addition_and_duplication
+- https://www.rieselprime.de/ziki/Elliptic_curve_method
 - https://en.wikipedia.org/wiki/Montgomery_curve
 - https://www.alpertron.com.ar/ECM.HTM (Click Help!)
 
@@ -28,3 +28,9 @@ numpy
 - https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test
 - https://en.wikipedia.org/wiki/Pollard%27s_rho_algorithm
 - https://en.wikipedia.org/wiki/Wheel_factorization
+
+## Referenced Papers
+
+### Elliptic Curve Method
+ - Paul Zimmermann, Bruce Dodson. 20 years of ECM. 7th Algorithmic Number Theory Symposium (ANTS VII), 2006, Berlin/Germany, Germany. pp.525–542. inria-00070192v2
+   - [Link](https://hal.inria.fr/inria-00070192v2)
