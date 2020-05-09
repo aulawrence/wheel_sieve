@@ -280,9 +280,6 @@ def ecm(n, rounds, b1, b2):
                 if 1 < res < n:
                     return res
                 elif res == n:
-                    res = gcd(cq[1], n)
-                    if 1 < res < n:
-                        return res
                     for xj in xj_list:
                         res = gcd(xj * cq[1] - cq[0], n)
                         if 1 < res < n:
