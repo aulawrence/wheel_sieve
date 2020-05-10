@@ -172,17 +172,19 @@ def mul_pt(pt, curve, k):
     Returns:
         (tuple(int, int)): Point kP.
     """
-    if k <= 1:
+    if k <= 2:
         if k < 0:
             # x and z coordinates are the same for P and -P.
             return mul_pt(pt, curve, -k)
         if k == 0:
             return (0, 0)
-        return pt
+        if k == 1:
+            return pt
+        return dbl_pt(pt, curve)
     res0 = pt
     res1 = dbl_pt(pt, curve)
     j = k.bit_length() - 2
-    while j >= 0:
+    while j >= 1:
         if (k >> j) % 2 == 1:
             res0 = add_pt(res1, res0, pt, curve)
             res1 = dbl_pt(res1, curve)
@@ -190,6 +192,10 @@ def mul_pt(pt, curve, k):
             res1 = add_pt(res1, res0, pt, curve)
             res0 = dbl_pt(res0, curve)
         j -= 1
+    if k % 2 == 1:
+        res0 = add_pt(res1, res0, pt, curve)
+    else:
+        res0 = dbl_pt(res0, curve)
     return res0
 
 
@@ -232,9 +238,6 @@ def ecm(n, rounds, b1, b2):
         int: Non-trivial factor if found, otherwise returns None.
     """
     assert n >= 12
-    k_ls = []
-    for p in PRIME_GEN(b1):
-        k_ls.append(p ** int(round(np.log(b1) / np.log(p))))
     for roundi in range(rounds):
         print("Round {}...".format(roundi))
         count = 0
@@ -257,8 +260,9 @@ def ecm(n, rounds, b1, b2):
         try:
             # Step 1
             print(" - Step 1")
-            for k in k_ls:
-                pt = check(mul_pt(pt, curve, k), curve)
+            for p in PRIME_GEN(b1):
+                for _ in range(int(round(np.log(b1) / np.log(p)))):
+                    pt = check(mul_pt(pt, curve, p), curve)
             # Step 2
             print(" - Step 2")
             q = pt
