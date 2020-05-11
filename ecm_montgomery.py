@@ -1,6 +1,6 @@
 import random
-import numpy as np
 from math import gcd
+import numpy as np
 from wheel_sieve_byte import PRIME_GEN, wheel_sieve
 
 
@@ -51,7 +51,7 @@ def inv(x, n):
 
 def get_curve_suyama(sigma, n):
     """Given parameter sigma, generate an Elliptic Curve (mod n) and a point on it using Suyama's parametrization.
-       The constructed cruve's group order is a multiple of 12, compared to 4 guaranteed for Montgomery Curves.
+       The constructed curve's group order is a multiple of 12, compared to 4 guaranteed for Montgomery Curves.
 
     Args:
         sigma (int): The sigma parameter.
@@ -90,7 +90,7 @@ def get_curve_a(x, A, n):
     """Given parameters x and A, generate an Elliptic Curve (mod n) and a point on it.
 
     Args:
-        x (int): Desited x coordinate of the point.
+        x (int): Desired x coordinate of the point.
         A (int): Parameter A of Montgomery Curve.
         n (int): Modulus.
 
@@ -221,7 +221,7 @@ def check(pt, curve):
 
 
 def init_wheel(b1, b2, wheel):
-    """Initizalize Wheel. Generates:
+    """Initialize Wheel. Generates:
     j_list: list of j, where 1 <= j < wheel // 2 and j coprime to wheel.
     prime_array: bitarray of whether each number in range [b1, b2) is a prime.
         The entries are stored in 8-bit little-endian format.

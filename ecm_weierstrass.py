@@ -1,6 +1,6 @@
 import random
-import numpy as np
 from math import gcd
+import numpy as np
 from wheel_sieve_byte import PRIME_GEN
 
 

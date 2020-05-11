@@ -26,7 +26,7 @@ def powmod(x, r, n):
 
 def witness_uniform(n, k):
     """Choose k distinct numbers from the range [2, n-2] with equal weights.
-       Assuming k << n for large n. Fails when k >= sqrt(n) and n above int64 range, which is not practal anyways.
+       Assuming k << n for large n. Fails when k >= sqrt(n) and n above int64 range, which is not practical anyways.
 
     Args:
         n (int): Number determining the range, n >= 4

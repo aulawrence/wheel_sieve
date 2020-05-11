@@ -6,7 +6,7 @@
 |ecm_montgomery.py|Lenstra Elliptic Curve Factorization in Montgomery Form||
 |ecm_weierstrass.py|Lenstra Elliptic Curve Factorization in Weierstrass Form|Slower than Montgomery Curve due to high cost of inverse.|
 |miller_rabin.py|Miller-Rabin Prime Test||
-|pollard_rho.py|Pollar's Rho Algorithm||
+|pollard_rho.py|Pollard's Rho Algorithm||
 |wheel_sieve_bit.py|Prime sieving with wheel factorization (bit array)|Implementation is slower than the byte version with the same memory constraint.|
 |wheel_sieve_byte.py|Prime sieving with wheel factorization||
 
