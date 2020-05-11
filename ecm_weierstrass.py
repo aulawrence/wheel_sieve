@@ -165,9 +165,9 @@ def ecm(n, rounds, b1, b2):
     """
     k_ls = []
     for p in PRIME_GEN(b1):
-        k_ls.append(p ** int(round(np.log(b1) / np.log(p))))
-    for roundi in range(rounds):
-        print("Round {}...".format(roundi))
+        k_ls.append(p ** int(np.log(b1) / np.log(p)))
+    for round_i in range(rounds):
+        print("Round {}...".format(round_i))
         count = 0
         delta = 0
         while delta == 0 and count < 20:
@@ -179,6 +179,7 @@ def ecm(n, rounds, b1, b2):
             curve = get_curve(pt, a, n)
             delta = get_delta(curve)
         if delta == 0:
+            print(" - Curve Init Failed.")
             break
         if 1 < delta < n:
             return delta
@@ -222,6 +223,7 @@ def ecm(n, rounds, b1, b2):
                     assert False
                 c += wheel
                 cq = add_pt_exn(cq, mq, curve)
+            print(" - End")
         except InverseNotFound as e:
             res = gcd(e.x, n)
             if 1 < res < n:

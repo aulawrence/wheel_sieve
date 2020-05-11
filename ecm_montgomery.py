@@ -1,7 +1,7 @@
 import random
 import numpy as np
 from math import gcd
-from wheel_sieve_byte import PRIME_GEN
+from wheel_sieve_byte import PRIME_GEN, wheel_sieve
 
 
 class InverseNotFound(Exception):
@@ -220,12 +220,47 @@ def check(pt, curve):
     return pt
 
 
+def init_wheel(b1, b2, wheel):
+    """Initizalize Wheel. Generates:
+    j_list: list of j, where 1 <= j < wheel // 2 and j coprime to wheel.
+    prime_array: bitarray of whether each number in range [b1, b2) is a prime.
+        The entries are stored in 8-bit little-endian format.
+        With c1 = b1 // wheel, if either of n1 = c * wheel + j or n2 = c * wheel - j is prime,
+        the following bit is set to 1:
+            axis 0: c - c1
+            axis 1: (index of j in j_list) // 8
+            bit # : (index of j in j_list) % 8
+
+    Args:
+        b1 (int): Lower bound of prime range.
+        b2 (int): Upper bound of prime range.
+        wheel (int): Wheel. Typically primorial numbers like 30, 210, 2310.
+
+    Returns:
+        tuple(list of int, np.array): (j_list, prime_array).
+    """
+    j_list = [j for j in range(1, wheel // 2) if gcd(j, wheel) == 1]
+    j_index = {j: i for i, j in enumerate(j_list)}
+    c1 = b1 // wheel
+    c2 = b2 // wheel + 2
+    prime_array = np.zeros((c2 -c1, (len(j_list) - 1) // 8 + 1), dtype=np.uint8)
+    for p in wheel_sieve(b1, b2):
+        c = p // wheel
+        j = p % wheel
+        if j > wheel // 2:
+            c += 1
+            j = wheel - j
+        jq, jr = divmod(j_index[j], 8)
+        prime_array[c - c1, jq] |= 1 << jr
+    return j_list, prime_array
+
+
 def ecm(n, rounds, b1, b2):
     """Elliptic Curve Factorization Method.
     For each round:
         0. Generate random point and curve.
         1. Repeatedly multiply the current point by small primes raised to some power, determined by b1.
-        2. Repeatedly try to multiply the point from step 1 by possible primes (with wheel of 2310) between b1 and b2.
+        2. Repeatedly try to multiply the point from step 1 by primes (with wheel of 2310) between b1 and b2.
     Returns when a non-trivial factor is found.
 
     Args:
@@ -238,8 +273,10 @@ def ecm(n, rounds, b1, b2):
         int: Non-trivial factor if found, otherwise returns None.
     """
     assert n >= 12
-    for roundi in range(rounds):
-        print("Round {}...".format(roundi))
+    wheel = 2310
+    j_list, prime_array = init_wheel(b1, b2, wheel)
+    for round_i in range(rounds):
+        print("Round {}...".format(round_i))
         count = 0
         success = False
         while not success and count < 20:
@@ -261,26 +298,28 @@ def ecm(n, rounds, b1, b2):
             # Step 1
             print(" - Step 1")
             for p in PRIME_GEN(b1):
-                for _ in range(int(round(np.log(b1) / np.log(p)))):
+                for _ in range(int(np.log(b1) / np.log(p))):
                     pt = check(mul_pt(pt, curve, p), curve)
             # Step 2
             print(" - Step 2")
             q = pt
-            wheel = 2310
             mq = check(mul_pt(q, curve, wheel), curve)
             xj_list = []
-            for j in [k for k in range(1, wheel // 2) if gcd(k, wheel) == 1]:
+            for j in j_list:
                 xj, zj = check(mul_pt(q, curve, j), curve)
                 xj_list.append(xj * inv(zj, n) % n)
-            c = (b1 // wheel) * wheel
-            cq = check(mul_pt(q, curve, c), curve)
-            cq_ = check(mul_pt(q, curve, c - wheel), curve)
-            while c < b2 + wheel:
+            c1 = b1 // wheel
+            c2 = b2 // wheel + 2
+            c = 0
+            cq = check(mul_pt(q, curve, c1 * wheel), curve)
+            cq_ = check(mul_pt(q, curve, (c1 - 1) * wheel), curve)
+            while c < c2 - c1:
                 s = 1
-                for xj in xj_list:
-                    t = (xj * cq[1] - cq[0]) % n
-                    if t != 0:
-                        s = s * t % n
+                for xj, is_prime in zip(xj_list, np.unpackbits(prime_array[c, :], bitorder="little")):
+                    if is_prime:
+                        t = (xj * cq[1] - cq[0]) % n
+                        if t != 0:
+                            s = s * t % n
                 res = gcd(s, n)
                 if 1 < res < n:
                     return res
@@ -292,8 +331,9 @@ def ecm(n, rounds, b1, b2):
                     # s is a multiple of n while each of {(xj *  cq[1] - cq[0]) % n} is not.
                     # There must be at least 2 non-trivial factors. The function should have returned.
                     assert False
-                c += wheel
+                c += 1
                 cq, cq_ = check(add_pt(cq, mq, cq_, curve), curve), cq
+            print(" - End")
         except InverseNotFound as e:
             res = gcd(e.x, n)
             if 1 < res < n:
@@ -303,5 +343,5 @@ def ecm(n, rounds, b1, b2):
 
 if __name__ == "__main__":
     random.seed(2)
-    n = 32795254512039893688982510946402035163613484930081  # (4110718401119136339711691 * 7977986160061812908308291)
-    print(ecm(n, 300, 50_000, 5_000_000))
+    n = 294636370796972331405770334382449402989049465216208991677129  # (406724252548875212358759885439 * 724413085648406196306771670711)
+    print(ecm(n, 430, 250_000, 40_000_000))
