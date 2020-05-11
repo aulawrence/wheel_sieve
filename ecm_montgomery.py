@@ -140,6 +140,23 @@ def add_pt(ptp, ptq, pt_, curve):
     zr = x_ * (u - v) ** 2 % n
     return (xr, zr)
 
+def add_pt_exn(ptp, ptq, pt_, curve):
+    """Computes point P+Q given points P, Q and P-Q, and curve.
+       Does not return correct result when P == Q, use dbl_pt instead.
+
+    Args:
+        ptp (tuple(int, int)): Point P.
+        ptq (tuple(int, int)): Point Q.
+        pt_ (tuple(int, int)): Point P-Q.
+        curve (tuple(int, int, int)): Curve.
+
+    Raises:
+        InverseNotFound: Thrown when point P+Q is the point at infinity.
+
+    Returns:
+        (tuple(int, int)): Point P+Q.
+    """
+    return check(add_pt(ptp, ptq, pt_, curve), curve)
 
 def dbl_pt(pt, curve):
     """Computes point 2P given point P and curve.
@@ -161,7 +178,7 @@ def dbl_pt(pt, curve):
     return (xr, zr)
 
 
-def mul_pt(pt, curve, k):
+def mul_pt_exn(pt, curve, k):
     """Computes point kP given point P, curve and k using Montgomery Ladder.
 
     Args:
@@ -169,18 +186,22 @@ def mul_pt(pt, curve, k):
         curve (tuple(int, int, int)): Curve.
         k (int): Multiplier.
 
+    Raises:
+        InverseNotFound: Thrown when point kP is the point at infinity.
+
     Returns:
         (tuple(int, int)): Point kP.
     """
     if k <= 2:
         if k < 0:
             # x and z coordinates are the same for P and -P.
-            return mul_pt(pt, curve, -k)
+            return mul_pt_exn(pt, curve, -k)
         if k == 0:
-            return (0, 0)
+            # InverseNotFound will be thrown
+            return check((0, 0), curve)
         if k == 1:
-            return pt
-        return dbl_pt(pt, curve)
+            return check(pt, curve)
+        return check(dbl_pt(pt, curve), curve)
     res0 = pt
     res1 = dbl_pt(pt, curve)
     j = k.bit_length() - 2
@@ -196,7 +217,7 @@ def mul_pt(pt, curve, k):
         res0 = add_pt(res1, res0, pt, curve)
     else:
         res0 = dbl_pt(res0, curve)
-    return res0
+    return check(res0, curve)
 
 
 def check(pt, curve):
@@ -299,20 +320,20 @@ def ecm(n, rounds, b1, b2):
             print(" - Step 1")
             for p in PRIME_GEN(b1):
                 for _ in range(int(np.log(b1) / np.log(p))):
-                    pt = check(mul_pt(pt, curve, p), curve)
+                    pt = mul_pt_exn(pt, curve, p)
             # Step 2
             print(" - Step 2")
             q = pt
-            mq = check(mul_pt(q, curve, wheel), curve)
+            mq = mul_pt_exn(q, curve, wheel)
             xj_list = []
             for j in j_list:
-                xj, zj = check(mul_pt(q, curve, j), curve)
+                xj, zj = mul_pt_exn(q, curve, j)
                 xj_list.append(xj * inv(zj, n) % n)
             c1 = b1 // wheel
             c2 = b2 // wheel + 2
             c = 0
-            cq = check(mul_pt(q, curve, c1 * wheel), curve)
-            cq_ = check(mul_pt(q, curve, (c1 - 1) * wheel), curve)
+            cq = mul_pt_exn(q, curve, c1 * wheel)
+            cq_ = mul_pt_exn(q, curve, (c1 - 1) * wheel)
             while c < c2 - c1:
                 s = 1
                 for xj, is_prime in zip(xj_list, np.unpackbits(prime_array[c, :], bitorder="little")):
@@ -332,7 +353,7 @@ def ecm(n, rounds, b1, b2):
                     # There must be at least 2 non-trivial factors. The function should have returned.
                     assert False
                 c += 1
-                cq, cq_ = check(add_pt(cq, mq, cq_, curve), curve), cq
+                cq, cq_ = add_pt_exn(cq, mq, cq_, curve), cq
             print(" - End")
         except InverseNotFound as e:
             res = gcd(e.x, n)
