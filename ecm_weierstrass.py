@@ -81,6 +81,34 @@ def add_pt_exn(pt1, pt2, curve):
     return (xr, yr)
 
 
+def add_pt_with_inv(pt1, pt2, curve, inv_dict):
+    """Adds two points pt1 and pt2 on curve with precomputed inverse.
+
+    Args:
+        pt1 (tuple(int, int)): Point (x1, y1). Use (None, None) for point at infinity.
+        pt2 (tuple(int, int)): Point (x2, y2). Use (None, None) for point at infinity.
+        curve (tuple(int, int, int)): (a, b, n) representing the Elliptic Curve y**2 = x**3 + a*x + b (mod n).
+        inv_set (dict(int, int)): dict mapping x to inverse of x (mod n) containing at least the number used in calculation.
+
+    Returns:
+        tuple(int, int): Point pt1 + pt2.
+    """
+    x1, y1 = pt1
+    x2, y2 = pt2
+    a, b, n = curve
+    if pt1 == (None, None):
+        return pt2
+    elif pt2 == (None, None):
+        return pt1
+    elif pt1 == pt2:
+        s = ((3 * x1 * x1 + a) * inv_dict[2 * y1 % n]) % n
+    else:
+        s = (y2 - y1) * inv_dict[(x2 - x1) % n] % n
+    xr = (s * s - x1 - x2) % n
+    yr = (s * (x1 - xr) - y1) % n
+    return (xr, yr)
+
+
 def mul_pt_exn(point, curve, k):
     """Multiplies point by k times on curve.
 

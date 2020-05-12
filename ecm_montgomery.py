@@ -95,6 +95,37 @@ def add_pt(ptp, ptq, pt_, curve):
     zr = x_ * (u - v) ** 2 % n
     return (xr, zr)
 
+def to_weierstrass(pt, curve):
+    """Given a point P and an Montgomery Curve it is on, computes the equivalent point and curve in weierstrass form.
+    Note: Multiple calls for same curve with different P will produce different output curves. This
+        is due to y-coordinates being omitted in the representation. Without the ability to square-root
+        y (mod n) by fixing B, the natural thing to do is to fix y and calculate B. So different point P
+        produces different B.
+
+    Args:
+        pt (tuple(int, int)): Point P in XZ form.
+        curve (tuple(int, int, int)): Curve in Montgomery form.
+
+    Returns:
+        tuple(tuple(int, int), tuple(int, int, int)): (Point, Curve), where
+            Point = (t, v) in XY form.
+            Curve = (a, b, n) representing the Elliptic Curve y**2 = x**3 + a*x + b (mod n).
+    """
+    x, z = pt
+    A, s, n = curve
+    y_norm = 1
+    x_norm = x * inv(z, n)
+    B = (x_norm ** 3 + A * x_norm ** 2 + x_norm) % n
+    assert B * y_norm ** 2 % n == (x_norm ** 3 + A * x_norm ** 2 + x_norm) % n
+    B_inv = inv(B, n)
+    three_inv = inv(3, n)
+    t = (x_norm * B_inv + A * three_inv * B_inv) % n
+    v = (y_norm * B_inv) % n
+    a = (3 - A ** 2) * three_inv * B_inv * B_inv % n
+    b = (2 * A ** 3 - 9 * A) * (three_inv * B_inv % n) ** 3 % n
+    assert v ** 2 % n == (t ** 3 + a * t + b) % n
+    return (t, v), (a, b, n)
+
 
 def add_pt_exn(ptp, ptq, pt_, curve):
     """Computes point P+Q given points P, Q and P-Q, and curve.
