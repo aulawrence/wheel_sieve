@@ -1,47 +1,7 @@
 import random
 from math import gcd
 import numpy as np
-from wheel_sieve_byte import PRIME_GEN
-
-
-class InverseNotFound(Exception):
-    """Inverse Not Found Exception. Cannot find inverse of x (mod n).
-
-    Args:
-        x (int): Number that could not be inverted.
-        n (int): Modulus.
-    """
-
-    def __init__(self, x, n):
-        super(InverseNotFound, self).__init__("Inverse of {0:d} (mod {1:d}) not found.".format(x, n))
-        self.x = x
-        self.n = n
-
-
-def inv(x, n):
-    """Compute inverse of x (mod n).
-
-    Args:
-        x (int): Number to be inverted.
-        n (int): Modulus.
-
-    Raises:
-        InverseNotFound: Thrown when x cannot be inverted.
-
-    Returns:
-        int: Inverse of x.
-    """
-    a = x % n
-    b = n
-    tb = 0
-    ta = 1
-    while a > 0:
-        (q, a), b = divmod(b, a), a
-        ta, tb = tb - q * ta, ta
-    assert (tb * x - b) % n == 0
-    if b != 1:
-        raise InverseNotFound(x % n, n)
-    return tb % n
+from ecm_common import PRIME_GEN, InverseNotFound, inv
 
 
 def get_curve(pt0, a, n):
