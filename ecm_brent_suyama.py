@@ -63,7 +63,9 @@ def step_difference_seq_exn(pt_list, curve):
     for i in range(len(pt_list) - 1):
         x1, y1 = pt_list[i]
         x2, y2 = pt_list[i + 1]
-        if x1 == x2 and y1 == y2:
+        if (x1, y1) == (None, None) or (x2, y2) == (None, None):
+            continue
+        if (x1, y1) == (x2, y2):
             denom = 2 * y1 % n
         else:
             denom = (x2 - x1) % n
