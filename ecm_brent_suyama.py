@@ -17,8 +17,10 @@ def apply_polynomial(coeff, x):
         int: f(x) = a0 + a1*x + ... + ai*x**i + ... an*x**n.
     """
     f = 0
-    for i, ai in enumerate(coeff):
-        f += ai * x ** i
+    xi = 1
+    for ai in coeff:
+        f += ai * xi
+        xi *= x
     return f
 
 
