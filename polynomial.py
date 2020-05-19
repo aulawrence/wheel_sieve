@@ -88,11 +88,7 @@ class Polynomial(object):
         if not isinstance(other, Polynomial) or other.n != self.n:
             raise ValueError
         d = max(len(self.coeff), len(other.coeff))
-        k = 8
-        target = (d * self.n ** 2 + 1) >> k
-        while target > 0:
-            target >>= k
-            k *= 2
+        k = (d * self.n ** 2 + 1).bit_length()
         beta = 1 << k
         alpha = beta - 1
         t_self = sum(ai << k * i for i, ai in enumerate(self.coeff))
