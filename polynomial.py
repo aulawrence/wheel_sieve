@@ -98,9 +98,8 @@ class Polynomial(object):
             t_other = sum(ai << k * i for i, ai in enumerate(other.coeff))
         t_res = t_self * t_other
         res = []
-        while t_res > 0:
-            res.append((t_res & alpha) % self.n)
-            t_res >>= k
+        for i in range((t_res.bit_length() - 1) // k + 1):
+            res.append(((t_res & (alpha << k * i)) >> k * i) % self.n)
         return Polynomial(res, self.n)
 
     def __divmod__(self, other):
