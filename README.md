@@ -24,7 +24,7 @@ numpy
 - https://en.wikipedia.org/wiki/Lenstra_elliptic-curve_factorization
 - https://www.rieselprime.de/ziki/Elliptic_curve_method
 - https://en.wikipedia.org/wiki/Montgomery_curve
-- https://www.alpertron.com.ar/ECM.HTM (Click Help!)
+- https://www.alpertron.com.ar/ECM.HTM
 
 ### Others
 - https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test
