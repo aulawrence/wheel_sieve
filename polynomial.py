@@ -89,17 +89,22 @@ class Polynomial(object):
             raise ValueError
         d = max(len(self.coeff), len(other.coeff))
         k = (d * self.n ** 2 + 1).bit_length()
-        beta = 1 << k
-        alpha = beta - 1
-        t_self = sum(ai << k * i for i, ai in enumerate(self.coeff))
+        k_8 = (k - 1) // 8 + 1
+        k = k_8 * 8
+        bt_self = bytes.join(b'', (ai.to_bytes(k_8, byteorder="little") for ai in self.coeff))
+        t_self = int.from_bytes(bt_self, byteorder="little")
         if self == other:
             t_other = t_self
         else:
-            t_other = sum(ai << k * i for i, ai in enumerate(other.coeff))
+            bt_other = bytes.join(b'', (ai.to_bytes(k_8, byteorder="little") for ai in other.coeff))
+            t_other = int.from_bytes(bt_other, byteorder="little")
         t_res = t_self * t_other
         res = []
-        for i in range((t_res.bit_length() - 1) // k + 1):
-            res.append(((t_res & (alpha << k * i)) >> k * i) % self.n)
+        bt_res = t_res.to_bytes((t_res.bit_length() - 1) // 8 + 1, byteorder="little")
+        i = 0
+        while i < len(bt_res):
+            res.append(int.from_bytes(bt_res[i:i + k_8], byteorder="little") % self.n)
+            i += k_8
         return Polynomial(res, self.n)
 
     def __divmod__(self, other):
