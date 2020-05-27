@@ -1,5 +1,5 @@
 import random
-from math import gcd
+from gmpy2 import gcd
 import numpy as np
 from ecm_common import PRIME_GEN, InverseNotFound, CurveInitFail, init_wheel, inv
 import ecm_montgomery as mnt

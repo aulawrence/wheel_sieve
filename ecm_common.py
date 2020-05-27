@@ -1,4 +1,5 @@
 from math import gcd
+from gmpy2 import divm
 import numpy as np
 from wheel_sieve_byte import PRIME_GEN, wheel_sieve
 
@@ -35,17 +36,10 @@ def inv(x, n):
     Returns:
         int: Inverse of x.
     """
-    a = x % n
-    b = n
-    tb = 0
-    ta = 1
-    while a > 0:
-        (q, a), b = divmod(b, a), a
-        ta, tb = tb - q * ta, ta
-    assert (tb * x - b) % n == 0
-    if b != 1:
+    try:
+        return divm(1, x, n)
+    except ZeroDivisionError:
         raise InverseNotFound(x % n, n)
-    return tb % n
 
 
 def init_wheel(b1, b2, wheel):

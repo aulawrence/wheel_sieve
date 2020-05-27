@@ -1,5 +1,5 @@
 import random
-from math import gcd
+from gmpy2 import mpz, gcd
 import numpy as np
 from ecm_common import PRIME_GEN, InverseNotFound, CurveInitFail, inv, init_wheel
 
@@ -38,7 +38,7 @@ def get_curve_suyama(sigma, n):
     # x0_norm = (x0 * inv(z0, n)) % n
     # y0_norm = (y * inv(z0, n)) % n
     # assert B * y0_norm ** 2 % n == (x0_norm ** 3 + A * x0_norm ** 2 + x0_norm) % n
-    return (x0, z0), (A, s, n)
+    return (mpz(x0), mpz(z0)), (mpz(A), mpz(s), mpz(n))
 
 
 def get_curve_a(x, A, n):
@@ -69,7 +69,7 @@ def get_curve_a(x, A, n):
     # y0_norm = 2
     # B = (x0_norm ** 3 + A * x0_norm ** 2 + x0_norm) * inv(y0_norm ** 2, n) % n
     # assert B * y0_norm ** 2 % n == (x0_norm ** 3 + A * x0_norm ** 2 + x0_norm) % n
-    return (x0, z0), (A, s, n)
+    return (mpz(x0), mpz(z0)), (mpz(A), mpz(s), mpz(n))
 
 
 def add_pt(ptp, ptq, pt_, curve):
@@ -124,7 +124,7 @@ def to_weierstrass(pt, curve):
     a = (3 - A ** 2) * three_inv * B_inv * B_inv % n
     b = (2 * A ** 3 - 9 * A) * (three_inv * B_inv % n) ** 3 % n
     assert v ** 2 % n == (t ** 3 + a * t + b) % n
-    return (t, v), (a, b, n)
+    return (mpz(t), mpz(v)), (mpz(a), mpz(b), mpz(n))
 
 
 def add_pt_exn(ptp, ptq, pt_, curve):
