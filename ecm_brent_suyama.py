@@ -59,25 +59,24 @@ def step_difference_seq_exn(pt_list, curve):
         curve (curve): Curve in Weierstrass form.
     """
     a, b, n = curve
-    denom_list = []
+    gen_list = [wst.add_pt_gen(pt_list[i], pt_list[i + 1], curve) for i in range(len(pt_list) - 1)]
+    denom_list = [gen.send(None) for gen in gen_list]
+    denom_set = set()
+    denom_inv_dict = dict()
     prod = 1
-    denom_inv_dict = {}
-    for i in range(len(pt_list) - 1):
-        x1, y1 = pt_list[i]
-        x2, y2 = pt_list[i + 1]
-        if (x1, y1) == (None, None) or (x2, y2) == (None, None):
-            continue
-        if (x1, y1) == (x2, y2):
-            denom = 2 * y1 % n
-        else:
-            denom = (x2 - x1) % n
-        denom_list.append(denom)
-        prod *= denom
-    prod_inv = inv(prod, n)
     for denom in denom_list:
-        denom_inv_dict[denom] = prod_inv * (prod // denom) % n
+        if denom is not None and denom not in denom_set:
+            denom_set.add(denom)
+            prod *= denom
+    if denom_set:
+        prod_inv = inv(prod, n)
+        for denom in denom_set:
+            denom_inv_dict[denom] = prod_inv * (prod // denom) % n
     for i in range(len(pt_list) - 1):
-        pt_list[i] = wst.add_pt_with_inv(pt_list[i], pt_list[i + 1], curve, denom_inv_dict)
+        if denom_list[i] is None:
+            pt_list[i] = gen_list[i].send(None)
+        else:
+            pt_list[i] = gen_list[i].send(denom_inv_dict[denom_list[i]])
 
 
 def ecm(n, rounds, b1, b2):
@@ -129,14 +128,15 @@ def ecm(n, rounds, b1, b2):
             print(" - Step 2")
             polynomial = (2, 0, 9, 0, 6, 0, 1)  # f(x) = x^6 + 6x^4 + 9x^2 + 2
             q, wst_curve = mnt.to_weierstrass(mnt_pt, mnt_curve)
-            xj_list = []
-            for j in j_list:
-                xj, yj = wst.mul_pt_exn(q, wst_curve, apply_polynomial(polynomial, j))
-                xj_list.append(xj)
             c1 = b1 // wheel
             c2 = b2 // wheel + 2
             c = 0
-            cq_list = [wst.mul_pt_exn(q, wst_curve, cqi) for cqi in get_difference_seq(polynomial, c1 * wheel, wheel)]
+            k_ls = [apply_polynomial(polynomial, j) for j in j_list] + get_difference_seq(polynomial, c1 * wheel, wheel)
+            mul_res = wst.mul_pt_multi(q, wst_curve, k_ls)
+            xj_list = []
+            for i in range(len(j_list)):
+                xj_list.append(mul_res[i][0])
+            cq_list = mul_res[len(j_list):]
             while c < c2 - c1:
                 # assert cq_list[0] == wst.mul_pt_exn(q, wst_curve, apply_polynomial(polynomial, (c + c1) * wheel))
                 s = cq_list[0][1] if cq_list[0][1] != 0 else 1

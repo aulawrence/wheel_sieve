@@ -148,15 +148,16 @@ def ecm(n, rounds, b1, b2):
             print(" - Step 2")
             polynomial = (2, 0, 9, 0, 6, 0, 1)  # f(x) = x^6 + 6x^4 + 9x^2 + 2
             q, wst_curve = mnt.to_weierstrass(mnt_pt, mnt_curve)
-            xj_list = []
-            for j in j_list:
-                xj, yj = wst.mul_pt_exn(q, wst_curve, apply_polynomial(polynomial, j))
-                xj_list.append(xj)
-            Fx = product_tree([Polynomial([n - xj, 1], n) for xj in xj_list], n)[0]
             c1 = b1 // wheel
             c2 = b2 // wheel + 2
             c = 0
-            cq_list = [wst.mul_pt_exn(q, wst_curve, cqi) for cqi in get_difference_seq(polynomial, c1 * wheel, wheel)]
+            k_ls = [apply_polynomial(polynomial, j) for j in j_list] + get_difference_seq(polynomial, c1 * wheel, wheel)
+            mul_res = wst.mul_pt_multi(q, wst_curve, k_ls)
+            xj_list = []
+            for i in range(len(j_list)):
+                xj_list.append(mul_res[i][0])
+            cq_list = mul_res[len(j_list):]
+            Fx = product_tree([Polynomial([n - xj, 1], n) for xj in xj_list], n)[0]
             g_poly_list = []
             while c < c2 - c1:
                 for _ in range(min(256, c2 - c1 - c)):

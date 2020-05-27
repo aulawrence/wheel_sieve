@@ -65,48 +65,54 @@ def add_pt_exn(pt1, pt2, curve):
     Returns:
         tuple(int, int): Point pt1 + pt2.
     """
-    x1, y1 = pt1
-    x2, y2 = pt2
     a, b, n = curve
-    if pt1 == (None, None):
-        return pt2
-    elif pt2 == (None, None):
-        return pt1
-    elif pt1 == pt2:
-        s = ((3 * x1 * x1 + a) * inv(2 * y1, n)) % n
+    gen = add_pt_gen(pt1, pt2, curve)
+    inv_req = gen.send(None)
+    if inv_req is None:
+        return gen.send(None)
     else:
-        s = (y2 - y1) * inv(x2 - x1, n) % n
-    xr = (s * s - x1 - x2) % n
-    yr = (s * (x1 - xr) - y1) % n
-    return (xr, yr)
+        return gen.send(inv(inv_req, n))
 
 
-def add_pt_with_inv(pt1, pt2, curve, inv_dict):
-    """Adds two points pt1 and pt2 on curve with precomputed inverse.
+def add_pt_gen(pt1, pt2, curve):
+    """Adds two points pt1 and pt2 on curve. Returns a generator that generates exactly 2 elements.
+    Step 0:
+        Send None to start generator.
+    Step 1: 
+        Generator yields the number to be inverted (mod n), or None if no inversion is required.
+        Send the inverted number to generator, or None if no inversion is required.
+    Step 2:
+        Generator yields the point pt1 + pt2.
 
     Args:
         pt1 (tuple(int, int)): Point (x1, y1). Use (None, None) for point at infinity.
         pt2 (tuple(int, int)): Point (x2, y2). Use (None, None) for point at infinity.
         curve (tuple(int, int, int)): (a, b, n) representing the Elliptic Curve y**2 = x**3 + a*x + b (mod n).
-        inv_set (dict(int, int)): dict mapping x to inverse of x (mod n) containing at least the number used in calculation.
 
-    Returns:
-        tuple(int, int): Point pt1 + pt2.
+    Yields:
+        int: The number to be inverted (mod n), or None if no inversion is required.
+        tuple(int, int): Point pt1+pt2.
     """
     x1, y1 = pt1
     x2, y2 = pt2
     a, b, n = curve
     if pt1 == (None, None):
-        return pt2
+        yield None
+        yield pt2
+        return
     elif pt2 == (None, None):
-        return pt1
+        yield None
+        yield pt1
+        return
     elif pt1 == pt2:
-        s = ((3 * x1 * x1 + a) * inv_dict[2 * y1 % n]) % n
+        res = yield 2 * y1
+        s = (3 * x1 * x1 + a) * res % n
     else:
-        s = (y2 - y1) * inv_dict[(x2 - x1) % n] % n
+        res = yield x2 - x1
+        s = (y2 - y1) * res % n
     xr = (s * s - x1 - x2) % n
     yr = (s * (x1 - xr) - y1) % n
-    return (xr, yr)
+    yield (xr, yr)
 
 
 def mul_pt_exn(point, curve, k):
@@ -132,6 +138,96 @@ def mul_pt_exn(point, curve, k):
         k //= 2
         point = add_pt_exn(point, point, curve)
     return res
+
+
+def mul_pt_gen(point, curve, k):
+    """Multiplies point by k times on curve. Returns a generator that generates multiple elements.
+    Step 0:
+        Send None to start generator.
+    Step 1: 
+        Generator yields the number to be inverted (mod n), or None if no inversion is required.
+        Send the inverted number to generator, or None if no inversion is required.
+        If the generator did not yield None, Repeat step 1.
+    Step 2:
+        Generator yields the point k * point.
+
+    Args:
+        point (tuple(int, int)): Point (x, y). Use (None, None) for point at infinity.
+        curve (tuple(int, int, int)): (a, b, n) representing the Elliptic Curve y**2 = x**3 + a*x + b (mod n).
+        k (int): Multiplier.
+
+    Yields:
+        int: The number to be inverted (mod n), or None if no inversion is required.
+        tuple(int, int): Point k * point.
+    """
+    if k < 0:
+        yield from mul_pt_gen(neg_pt(point, curve), curve, -k)
+        return
+    res = (None, None)
+    while k >= 1:
+        if k % 2 == 1:
+            gen = add_pt_gen(res, point, curve)
+            inv_req = gen.send(None)
+            if inv_req is None:
+                res = gen.send(None)
+            else:
+                inv_res = yield inv_req
+                res = gen.send(inv_res)
+        k //= 2
+        gen = add_pt_gen(point, point, curve)
+        inv_req = gen.send(None)
+        if inv_req is None:
+            point = gen.send(None)
+        else:
+            inv_res = yield inv_req
+            point = gen.send(inv_res)
+    yield None
+    yield res
+
+
+def mul_pt_multi(point, curve, k_ls):
+    """Multiply point by k times on curve, for k in k_ls.
+    Uses Montgomery's trick to reduce number of modular inversions.
+
+    Args:
+        point (tuple(int, int)): Point (x, y). Use (None, None) for point at infinity.
+        curve (tuple(int, int, int)): (a, b, n) representing the Elliptic Curve y**2 = x**3 + a*x + b (mod n).
+        k_ls (list of int): List of multiplier.
+
+    Raises:
+        InverseNotFound: Thrown when a number cannot be inverted during the calculation.
+
+    Returns:
+        list of tuple(int, int): List of points [k * point for k in k_ls].
+    """
+    a, b, n = curve
+    gen_list = [mul_pt_gen(point, curve, k) for k in k_ls]
+    denom_list = [gen.send(None) for gen in gen_list]
+    working_set = set()
+    for i in range(len(k_ls)):
+        if denom_list[i] is not None:
+            working_set.add(i)
+    denom_set = set()
+    denom_inv_dict = dict()
+    while working_set:
+        prod = 1
+        for i in working_set:
+            if denom_list[i] is not None and denom_list[i] not in denom_set:
+                denom_set.add(denom_list[i])
+                prod = prod * denom_list[i]
+        prod_inv = inv(prod, n)
+        for denom in denom_set:
+            denom_inv_dict[denom] = prod_inv * (prod // denom) % n
+        remove_set = set()
+        for i in working_set:
+            while denom_list[i] is not None and denom_list[i] in denom_set:
+                denom_list[i] = gen_list[i].send(denom_inv_dict[denom_list[i]])
+            if denom_list[i] is None:
+                remove_set.add(i)
+        working_set -= remove_set
+        denom_set.clear()
+        denom_inv_dict.clear()
+    return [gen.send(None) for gen in gen_list]
 
 
 def ecm(n, rounds, b1, b2):
