@@ -38,7 +38,32 @@ def product_tree(poly_list, n):
     return res
 
 
-def remainder_tree(f, g_list, n):
+def recip_tree(prod_tree):
+    """Recip Tree Algorithm. Compute the reciprocal polynomail of each element in the given product tree.
+
+    Args:
+        prod_tree (list of Polynomial): Product Tree.
+
+    Returns:
+        list of Polynomial: The Recip Tree, a complete binary tree in list form.
+            The root node is at position 0 of the list. The children of node i are node 2*i+1 and node 2*i+2.
+            r_tree[i] = prod_tree[i].recip()
+    """
+    r_tree = [prod_tree[0].recip()]
+    for i in range(len(prod_tree) // 2):
+        gi_recip = r_tree[i]
+        g1 = prod_tree[2 * i + 1]
+        g2 = prod_tree[2 * i + 2]
+        d1 = len(g1.coeff) - 1
+        d2 = len(g2.coeff) - 1
+        g1_recip = (gi_recip[d2:] * g2)[d2:]
+        r_tree.append(g1_recip)
+        g2_recip = (gi_recip[d1:] * g1)[d1:]
+        r_tree.append(g2_recip)
+    return r_tree
+
+
+def remainder_tree(f, g_tree, g_recip_tree, n):
     """Remainder Tree Algorithm. Given polynomials f, g_1, g_2, ..., g_m where g_i(x) = x - x_i,
     use a product tree to compute :math:\prod_{i=0}^{m}(f \mod g_i) \mod n, which is :math:\prod_{i=0}^{m} f(x_i) \mod n.
     If one f(x_i) is zero, the product will be zero. To prevent this, a slight change is added to omit those terms from the product.
@@ -48,27 +73,15 @@ def remainder_tree(f, g_list, n):
 
     Args:
         f (Polynomial): Polynomial f.
-        g_list (list of Polynomial): List of polynomial [g_1, g_2, ..., g_m]. Each of g_i is assumed to be of degree 1.
+        g_tree (list of Polynomial): Product Tree of polynomial [g_1, g_2, ..., g_m]. Each of g_i is assumed to be of degree 1.
+        g_recip_tree (list of Polynomial): Recip Tree of g_tree.
         n (int): Modolus.
 
     Returns:
         list of Polynomial: The Remainder Tree, a complete binary tree in list form.
             The root node is at position 0 of the list. The children of node i are node 2*i+1 and node 2*i+2.
     """
-    g_tree = product_tree(g_list, n)
-    g_recip_tree = [g_tree[0].recip()]
     f_mod_g_tree = []
-    i = 0
-    for i in range(len(g_tree) // 2):
-        gi_recip = g_recip_tree[i]
-        g1 = g_tree[2 * i + 1]
-        g2 = g_tree[2 * i + 2]
-        d1 = len(g1.coeff) - 1
-        d2 = len(g2.coeff) - 1
-        g1_recip = (gi_recip[d2:] * g2)[d2:]
-        g_recip_tree.append(g1_recip)
-        g2_recip = (gi_recip[d1:] * g1)[d1:]
-        g_recip_tree.append(g2_recip)
     for i in range(len(g_tree)):
         gi = g_tree[i]
         gi_recip = g_recip_tree[i]
@@ -157,24 +170,28 @@ def ecm(n, rounds, b1, b2):
             for i in range(len(j_list)):
                 xj_list.append(mul_res[i][0])
             cq_list = mul_res[len(j_list):]
-            Fx = product_tree([Polynomial([n - xj, 1], n) for xj in xj_list], n)[0]
+            f_tree = product_tree([Polynomial([n - xj, 1], n) for xj in xj_list], n)
+            f_recip_tree = recip_tree(f_tree)
+            H = Polynomial([1], n)
             g_poly_list = []
             while c < c2 - c1:
-                for _ in range(min(256, c2 - c1 - c)):
+                for _ in range(min(128, c2 - c1 - c)):
                     g_poly_list.append(Polynomial([n - cq_list[0][0], 1], n))
                     step_difference_seq_exn(cq_list, wst_curve)
                     c += 1
-                rem_tree = remainder_tree(Fx, g_poly_list, n)
-                res = gcd(rem_tree[0], n)
-                if 1 < res < n:
-                    return res
-                elif res == n:
-                    for rem in rem_tree[len(rem_tree) // 2:]:
-                        res = gcd(rem, n)
-                        if 1 < res < n:
-                            return res
-                    assert False
+                G = product_tree(g_poly_list, n)[0]
+                H = (H * G).mod_with_recip(f_tree[0], f_recip_tree[0])
                 g_poly_list.clear()
+            rem_tree = remainder_tree(H, f_tree, f_recip_tree, n)
+            res = gcd(rem_tree[0], n)
+            if 1 < res < n:
+                return res
+            elif res == n:
+                for rem in rem_tree[len(rem_tree) // 2:]:
+                    res = gcd(rem, n)
+                    if 1 < res < n:
+                        return res
+                assert False
             print(" - End")
         except InverseNotFound as e:
             res = gcd(e.x, n)
