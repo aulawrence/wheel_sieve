@@ -5,12 +5,18 @@
 |--|--|--|
 |[ecm_brent_suyama.py](ecm_brent_suyama.py)|ECM: Stage 1 in Montgomery Form, Stage 2 Standard Continuation with Brent-Suyama's Extension||
 |[ecm_montgomery.py](ecm_montgomery.py)|Lenstra Elliptic Curve Factorization in Montgomery Form and XZ coordinates||
-|[ecm_polyeval.py](ecm_polyeval.py)|ECM: Stage 1 in Montgomery Form, Stage 2 Standard Continuation with Brent-Suyama's Extension and Polyeval|Implementation is slower than ecm_brent_suyama.py, likely due to Polynomial.\_\_mul\_\_.|
+|[ecm_polyeval.py](ecm_polyeval.py)|ECM: Stage 1 in Montgomery Form, Stage 2 Standard Continuation with Brent-Suyama's Extension and Polyeval||
 |[ecm_weierstrass.py](ecm_weierstrass.py)|Lenstra Elliptic Curve Factorization in Weierstrass Form and XY coordinates|Slower than Montgomery Curve due to high cost of inverse.|
 |[miller_rabin.py](miller_rabin.py)|Miller-Rabin Prime Test||
 |[pollard_rho.py](pollard_rho.py)|Pollard's Rho Algorithm||
 |[wheel_sieve_bit.py](wheel_sieve_bit.py)|Prime sieving with wheel factorization (bit array)|Implementation is slower than the byte version with the same memory constraint.|
 |[wheel_sieve_byte.py](wheel_sieve_byte.py)|Prime sieving with wheel factorization||
+
+## Branches
+|Branch|Description|
+|--|--|
+|master|Master branch|
+|gmp|Uses gmpy2 to speed up integer arithmetic|
 
 ## Dependencies
 Python 3.5+
