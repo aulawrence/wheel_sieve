@@ -21,6 +21,7 @@
 ## Dependencies
 Python 3.5+
 ```
+gmpy2
 numpy
 ```
 
