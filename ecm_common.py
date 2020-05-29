@@ -81,3 +81,46 @@ def init_wheel(b1, b2, wheel):
         jq, jr = divmod(j_index[j], 8)
         prime_array[c - c1, jq] |= 1 << jr
     return j_list, prime_array
+
+
+def inv_multi(element_list, n):
+    """Compute inverse (mod n) of multiple elements.
+    Uses Montgomery's trick so that for a list of length k, it only takes 1 modular inverse and O(k) modular multiplications
+    instead of k modular inverses.
+
+    Args:
+        element_list (list of int): List of elements to be inverted (mod n).
+        n (int): Modulus.
+
+    Returns:
+        dict (int, int): Dictionary mapping elements to their inverse.
+    """
+    inv_dict = dict()
+    d = len(element_list)
+    if d == 1:
+        inv_dict[element_list[0]] = inv(element_list[0], n)
+        return inv_dict
+    k = 1 << (d - 1).bit_length()
+    element_tree = [None] * (k - 1) + [1] * k
+    element_tree[k - 1:k + d - 1] = element_list
+    while k > 1:
+        for i in range(k // 2 - 1, k - 1):
+            element_tree[i] = element_tree[2 * i + 1] * element_tree[2 * i + 2] % n
+        k //= 2
+    element_tree[0] = inv(element_tree[0], n)
+    k = 2
+    while k < d:
+        for i in range(k // 2 - 1, k - 1):
+            inv1 = element_tree[i] * element_tree[2 * i + 2] % n
+            inv2 = element_tree[i] * element_tree[2 * i + 1] % n
+            element_tree[2 * i + 1] = inv1
+            element_tree[2 * i + 2] = inv2
+        k *= 2
+    for i in range(k - 1, k + d - 1):
+        element = element_tree[i]
+        if i % 2 == 0:
+            inv_element = element_tree[(i - 1) // 2] * element_tree[i - 1] % n
+        else:
+            inv_element = element_tree[(i - 1) // 2] * element_tree[i + 1] % n
+        inv_dict[element] = inv_element
+    return inv_dict

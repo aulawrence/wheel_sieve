@@ -1,7 +1,7 @@
 import random
 from math import gcd
 import numpy as np
-from ecm_common import PRIME_GEN, InverseNotFound, CurveInitFail, init_wheel, inv
+from ecm_common import PRIME_GEN, InverseNotFound, CurveInitFail, init_wheel, inv, inv_multi
 import ecm_montgomery as mnt
 import ecm_weierstrass as wst
 
@@ -62,16 +62,11 @@ def step_difference_seq_exn(pt_list, curve):
     gen_list = [wst.add_pt_gen(pt_list[i], pt_list[i + 1], curve) for i in range(len(pt_list) - 1)]
     denom_list = [gen.send(None) for gen in gen_list]
     denom_set = set()
-    denom_inv_dict = dict()
-    prod = 1
     for denom in denom_list:
-        if denom is not None and denom not in denom_set:
+        if denom is not None:
             denom_set.add(denom)
-            prod *= denom
     if denom_set:
-        prod_inv = inv(prod, n)
-        for denom in denom_set:
-            denom_inv_dict[denom] = prod_inv * (prod // denom) % n
+        denom_inv_dict = inv_multi(list(denom_set), n)
     for i in range(len(pt_list) - 1):
         if denom_list[i] is None:
             pt_list[i] = gen_list[i].send(None)

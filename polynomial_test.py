@@ -1,6 +1,5 @@
 import random
 import unittest
-
 from polynomial import Polynomial, inv
 
 
@@ -138,6 +137,22 @@ class TestPolynomialMethods(unittest.TestCase):
         n = 97
         a = [random.randint(0, n - 1) for _ in range(65)]
         self.assertEqual(Polynomial(recip(a, n), n), Polynomial(a, n).recip())
+
+    def test_mod_with_recip(self):
+        n = 5
+        a1 = Polynomial([3], n)
+        a2 = Polynomial([2], n)
+        b = Polynomial([4], n)
+        b_recip = b.recip()
+        self.assertEqual(divmod(a1, b)[1], a1.mod_with_recip(b, b_recip))
+        self.assertEqual(divmod(a2, b)[1], a2.mod_with_recip(b, b_recip))
+        n = 5
+        a1 = Polynomial(list(range(5)) * 20, n)
+        a2 = Polynomial(list(range(5)) * 10, n)
+        b = Polynomial([1, 2, 3, 1], n)
+        b_recip = b.recip()
+        self.assertEqual(divmod(a1, b)[1], a1.mod_with_recip(b, b_recip))
+        self.assertEqual(divmod(a2, b)[1], a2.mod_with_recip(b, b_recip))
 
 
 if __name__ == "__main__":

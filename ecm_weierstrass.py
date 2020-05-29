@@ -1,7 +1,7 @@
 import random
 from math import gcd
 import numpy as np
-from ecm_common import PRIME_GEN, InverseNotFound, inv
+from ecm_common import PRIME_GEN, InverseNotFound, inv, inv_multi
 
 
 def get_curve(pt0, a, n):
@@ -105,10 +105,10 @@ def add_pt_gen(pt1, pt2, curve):
         yield pt1
         return
     elif pt1 == pt2:
-        res = yield 2 * y1
+        res = yield 2 * y1 % n
         s = (3 * x1 * x1 + a) * res % n
     else:
-        res = yield x2 - x1
+        res = yield (x2 - x1) % n
         s = (y2 - y1) * res % n
     xr = (s * s - x1 - x2) % n
     yr = (s * (x1 - xr) - y1) % n
@@ -204,29 +204,25 @@ def mul_pt_multi(point, curve, k_ls):
     gen_list = [mul_pt_gen(point, curve, k) for k in k_ls]
     denom_list = [gen.send(None) for gen in gen_list]
     working_set = set()
+    denom_set = set()
     for i in range(len(k_ls)):
         if denom_list[i] is not None:
             working_set.add(i)
-    denom_set = set()
-    denom_inv_dict = dict()
+            denom_set.add(denom_list[i])
+    remove_set = set()
     while working_set:
-        prod = 1
+        denom_inv_dict = inv_multi(list(denom_set), n)
+        denom_set.clear()
         for i in working_set:
-            if denom_list[i] is not None and denom_list[i] not in denom_set:
-                denom_set.add(denom_list[i])
-                prod = prod * denom_list[i]
-        prod_inv = inv(prod, n)
-        for denom in denom_set:
-            denom_inv_dict[denom] = prod_inv * (prod // denom) % n
-        remove_set = set()
-        for i in working_set:
-            while denom_list[i] is not None and denom_list[i] in denom_set:
+            denom_list[i] = gen_list[i].send(denom_inv_dict[denom_list[i]])
+            if denom_list[i] in denom_inv_dict:
                 denom_list[i] = gen_list[i].send(denom_inv_dict[denom_list[i]])
             if denom_list[i] is None:
                 remove_set.add(i)
+            else:
+                denom_set.add(denom_list[i])
         working_set -= remove_set
-        denom_set.clear()
-        denom_inv_dict.clear()
+        remove_set.clear()
     return [gen.send(None) for gen in gen_list]
 
 

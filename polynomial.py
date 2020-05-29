@@ -130,17 +130,47 @@ class Polynomial(object):
             other_recip = other.recip()
             d = qn - 1
             dividend = self
-            quo_list = []
+            poly_quo = Polynomial([0], self.n)
             while True:
                 quo = (dividend[d:] * other_recip)[d:]
-                quo_list.append(quo)
+                poly_quo += quo
                 rem = dividend - quo * other
                 if len(rem.coeff) < len(other.coeff) or (len(rem.coeff) == 1 and rem.coeff[0] == 0):
                     break
                 dividend = rem
-            poly_quo = sum(quo_list[1:], quo_list[0])
             poly_rem = rem
         return poly_quo, poly_rem
+
+    def mod_with_recip(self, other, other_recip):
+        """Compute polynomial remainder self % other given reciprocal polynomial other_recip.
+
+        Args:
+            other (Polynomial): Modulus.
+            other_recip (Polynomial): The reciprocal polynomial of the modulus.
+
+        Raises:
+            ValueError: Thrown when other is not Polynomial or is incompatible.
+
+        Returns:
+            Polynomial: Remainder.
+        """
+        if not isinstance(other, Polynomial) or other.n != self.n:
+            raise ValueError
+        pn = len(self.coeff)
+        qn = len(other.coeff)
+        if pn < qn:
+            poly_rem = Polynomial(self.coeff, self.n, copy=True)
+        else:
+            d = qn - 1
+            dividend = self
+            while True:
+                quo = (dividend[d:] * other_recip)[d:]
+                rem = dividend - quo * other
+                if len(rem.coeff) < len(other.coeff) or (len(rem.coeff) == 1 and rem.coeff[0] == 0):
+                    break
+                dividend = rem
+            poly_rem = rem
+        return poly_rem
 
     def recip(self):
         """Get the reciprocal polynomial. For f(x) of degree n, recip(f)(x) = floor( x^2n / f(x) ).
@@ -173,5 +203,5 @@ class Polynomial(object):
         if k == d * 2:
             # Only needed when k is a power of 2.
             res.coeff.insert(0, e_curr * inv_fn % self.n)
-        res.coeff = res.coeff[-d-1:]
+        res.coeff = res.coeff[-d - 1:]
         return res
