@@ -1,7 +1,8 @@
 import random
+import time
 from gmpy2 import gcd
 import numpy as np
-from ecm_common import PRIME_GEN, InverseNotFound, CurveInitFail, init_wheel, inv
+from ecm_common import PRIME_GEN, InverseNotFound, CurveInitFail, init_wheel, inv, inv_multi
 import ecm_montgomery as mnt
 import ecm_weierstrass as wst
 
@@ -62,16 +63,11 @@ def step_difference_seq_exn(pt_list, curve):
     gen_list = [wst.add_pt_gen(pt_list[i], pt_list[i + 1], curve) for i in range(len(pt_list) - 1)]
     denom_list = [gen.send(None) for gen in gen_list]
     denom_set = set()
-    denom_inv_dict = dict()
-    prod = 1
     for denom in denom_list:
-        if denom is not None and denom not in denom_set:
+        if denom is not None:
             denom_set.add(denom)
-            prod *= denom
     if denom_set:
-        prod_inv = inv(prod, n)
-        for denom in denom_set:
-            denom_inv_dict[denom] = prod_inv * (prod // denom) % n
+        denom_inv_dict = inv_multi(list(denom_set), n)
     for i in range(len(pt_list) - 1):
         if denom_list[i] is None:
             pt_list[i] = gen_list[i].send(None)
@@ -98,8 +94,11 @@ def ecm(n, rounds, b1, b2):
     """
     assert n >= 12
     wheel = 2310
+    st = time.time()
     j_list, prime_array = init_wheel(b1, b2, wheel)
+    print("Init time: {:.2f}".format(time.time() - st))
     for round_i in range(rounds):
+        st = time.time()
         print("Round {}...".format(round_i))
         count = 0
         success = False
@@ -120,12 +119,12 @@ def ecm(n, rounds, b1, b2):
             break
         try:
             # Step 1
-            print(" - Step 1")
+            print("{:>5.2f}: Step 1".format(time.time() - st))
             for p in PRIME_GEN(b1):
                 for _ in range(int(np.log(b1) / np.log(p))):
                     mnt_pt = mnt.mul_pt_exn(mnt_pt, mnt_curve, p)
             # Step 2
-            print(" - Step 2")
+            print("{:>5.2f}: Step 2".format(time.time() - st))
             polynomial = (2, 0, 9, 0, 6, 0, 1)  # f(x) = x^6 + 6x^4 + 9x^2 + 2
             q, wst_curve = mnt.to_weierstrass(mnt_pt, mnt_curve)
             c1 = b1 // wheel
@@ -161,7 +160,7 @@ def ecm(n, rounds, b1, b2):
                     assert False
                 c += 1
                 step_difference_seq_exn(cq_list, wst_curve)
-            print(" - End")
+            print("{:>5.2f}: End".format(time.time() - st))
         except InverseNotFound as e:
             res = gcd(e.x, n)
             if 1 < res < n:
