@@ -1,4 +1,5 @@
 import random
+import time
 from math import gcd
 import numpy as np
 from ecm_common import PRIME_GEN, InverseNotFound, CurveInitFail, inv, init_wheel
@@ -94,6 +95,7 @@ def add_pt(ptp, ptq, pt_, curve):
     xr = z_ * (u + v) ** 2 % n
     zr = x_ * (u - v) ** 2 % n
     return (xr, zr)
+
 
 def to_weierstrass(pt, curve):
     """Given a point P and an Montgomery Curve it is on, computes the equivalent point and curve in weierstrass form.
@@ -248,8 +250,11 @@ def ecm(n, rounds, b1, b2):
     """
     assert n >= 12
     wheel = 2310
+    st = time.time()
     j_list, prime_array = init_wheel(b1, b2, wheel)
+    print("Init time: {:.2f}".format(time.time() - st))
     for round_i in range(rounds):
+        st = time.time()
         print("Round {}...".format(round_i))
         count = 0
         success = False
@@ -270,12 +275,12 @@ def ecm(n, rounds, b1, b2):
             break
         try:
             # Step 1
-            print(" - Step 1")
+            print("{:>5.2f}: Step 1".format(time.time() - st))
             for p in PRIME_GEN(b1):
                 for _ in range(int(np.log(b1) / np.log(p))):
                     pt = mul_pt_exn(pt, curve, p)
             # Step 2
-            print(" - Step 2")
+            print("{:>5.2f}: Step 2".format(time.time() - st))
             q = pt
             mq = mul_pt_exn(q, curve, wheel)
             xj_list = []
@@ -307,7 +312,7 @@ def ecm(n, rounds, b1, b2):
                     assert False
                 c += 1
                 cq, cq_ = add_pt_exn(cq, mq, cq_, curve), cq
-            print(" - End")
+            print("{:>5.2f}: End".format(time.time() - st))
         except InverseNotFound as e:
             res = gcd(e.x, n)
             if 1 < res < n:

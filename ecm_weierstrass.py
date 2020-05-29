@@ -1,4 +1,5 @@
 import random
+import time
 from math import gcd
 import numpy as np
 from ecm_common import PRIME_GEN, InverseNotFound, inv, inv_multi
@@ -247,6 +248,7 @@ def ecm(n, rounds, b1, b2):
     for p in PRIME_GEN(b1):
         k_ls.append(p ** int(np.log(b1) / np.log(p)))
     for round_i in range(rounds):
+        st = time.time()
         print("Round {}...".format(round_i))
         count = 0
         delta = 0
@@ -265,11 +267,11 @@ def ecm(n, rounds, b1, b2):
             return delta
         try:
             # Step 1
-            print(" - Step 1")
+            print("{:>5.2f}: Step 1".format(time.time() - st))
             for k in k_ls:
                 pt = mul_pt_exn(pt, curve, k)
             # Step 2
-            print(" - Step 2")
+            print("{:>5.2f}: Step 2".format(time.time() - st))
             q = pt
             wheel = 210
             mq = mul_pt_exn(q, curve, wheel)
@@ -303,7 +305,7 @@ def ecm(n, rounds, b1, b2):
                     assert False
                 c += wheel
                 cq = add_pt_exn(cq, mq, curve)
-            print(" - End")
+            print("{:>5.2f}: End".format(time.time() - st))
         except InverseNotFound as e:
             res = gcd(e.x, n)
             if 1 < res < n:

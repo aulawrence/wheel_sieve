@@ -1,4 +1,5 @@
 import random
+import time
 from math import gcd
 import numpy as np
 from ecm_common import PRIME_GEN, InverseNotFound, CurveInitFail
@@ -133,6 +134,7 @@ def ecm(n, rounds, b1, b2):
     wheel = 2310
     j_list = [j for j in range(1, wheel // 2) if gcd(j, wheel) == 1]
     for round_i in range(rounds):
+        st = time.time()
         print("Round {}...".format(round_i))
         count = 0
         success = False
@@ -153,12 +155,12 @@ def ecm(n, rounds, b1, b2):
             break
         try:
             # Step 1
-            print(" - Step 1")
+            print("{:>5.2f}: Step 1".format(time.time() - st))
             for p in PRIME_GEN(b1):
                 for _ in range(int(np.log(b1) / np.log(p))):
                     mnt_pt = mnt.mul_pt_exn(mnt_pt, mnt_curve, p)
             # Step 2
-            print(" - Step 2")
+            print("{:>5.2f}: Step 2".format(time.time() - st))
             polynomial = (2, 0, 9, 0, 6, 0, 1)  # f(x) = x^6 + 6x^4 + 9x^2 + 2
             q, wst_curve = mnt.to_weierstrass(mnt_pt, mnt_curve)
             c1 = b1 // wheel
@@ -192,7 +194,7 @@ def ecm(n, rounds, b1, b2):
                     if 1 < res < n:
                         return res
                 assert False
-            print(" - End")
+            print("{:>5.2f}: End".format(time.time() - st))
         except InverseNotFound as e:
             res = gcd(e.x, n)
             if 1 < res < n:
