@@ -20,6 +20,8 @@
 
 ## Dependencies
 Python 3.5+
+
+As listed in [requirements.txt](requirements.txt):
 ```
 gmpy2
 numpy
