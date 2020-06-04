@@ -92,8 +92,8 @@ def add_pt(ptp, ptq, pt_, curve):
     A, s, n = curve
     u = (xp - zp) * (xq + zq) % n
     v = (xp + zp) * (xq - zq) % n
-    xr = z_ * (u + v) ** 2 % n
-    zr = x_ * (u - v) ** 2 % n
+    xr = z_ * ((u + v) ** 2 % n) % n
+    zr = x_ * ((u - v) ** 2 % n) % n
     return (xr, zr)
 
 
@@ -164,7 +164,7 @@ def dbl_pt(pt, curve):
     b = (x - z) ** 2 % n
     t = a - b
     xr = a * b % n
-    zr = t * (b + s * t) % n
+    zr = t * ((b + s * t) % n) % n
     return (xr, zr)
 
 
