@@ -14,14 +14,7 @@ def powmod(x, r, n):
     Returns:
         int: (x ** r) % n
     """
-    y = 1
-    x1 = x % n
-    while r >= 1:
-        if r % 2 == 1:
-            y = (y * x1) % n
-        r //= 2
-        x1 = (x1 ** 2) % n
-    return y
+    return pow(x, r, n)
 
 
 def witness_uniform(n, k):
