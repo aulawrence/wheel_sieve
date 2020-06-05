@@ -3,11 +3,11 @@
 ## Files
 |File|Description|Remark|
 |--|--|--|
-|[ecm_brent_suyama.py](wheel_sieve/ecm_brent_suyama.py)|ECM: Stage 1 in Montgomery Form, Stage 2 Standard Continuation with Brent-Suyama's Extension||
-|[ecm_montgomery.py](wheel_sieve/ecm_montgomery.py)|Lenstra Elliptic Curve Factorization in Montgomery Form and XZ coordinates||
-|[ecm_polyeval.py](wheel_sieve/ecm_polyeval.py)|ECM: Stage 1 in Montgomery Form, Stage 2 Standard Continuation with Brent-Suyama's Extension and Polyeval||
+|[ecm_brent_suyama.py](wheel_sieve/ecm/ecm_brent_suyama.py)|ECM: Stage 1 in Montgomery Form, Stage 2 Standard Continuation with Brent-Suyama's Extension||
+|[ecm_montgomery.py](wheel_sieve/ecm/ecm_montgomery.py)|Lenstra Elliptic Curve Factorization in Montgomery Form and XZ coordinates||
+|[ecm_polyeval.py](wheel_sieve/ecm/ecm_polyeval.py)|ECM: Stage 1 in Montgomery Form, Stage 2 Standard Continuation with Brent-Suyama's Extension and Polyeval||
+|[ecm_weierstrass.py](wheel_sieve/ecm/ecm_weierstrass.py)|Lenstra Elliptic Curve Factorization in Weierstrass Form and XY coordinates|Slower than Montgomery Curve due to high cost of inverse.|
 |[factorize.py](wheel_sieve/factorize.py)|Integer factorization with ECM||
-|[ecm_weierstrass.py](wheel_sieve/ecm_weierstrass.py)|Lenstra Elliptic Curve Factorization in Weierstrass Form and XY coordinates|Slower than Montgomery Curve due to high cost of inverse.|
 |[miller_rabin.py](wheel_sieve/miller_rabin.py)|Miller-Rabin Prime Test||
 |[pollard_rho.py](wheel_sieve/pollard_rho.py)|Pollard's Rho Algorithm||
 |[wheel_sieve_bit.py](wheel_sieve/wheel_sieve_bit.py)|Prime sieving with wheel factorization (bit array)|Implementation is slower than the byte version with the same memory constraint.|
