@@ -1,5 +1,5 @@
 import unittest
-from ecm_common import inv, inv_multi, gcd, InverseNotFound
+from ecm_common import inv, inv_multi, inv_power, gcd, InverseNotFound
 
 
 class TestECMCommon(unittest.TestCase):
@@ -19,6 +19,13 @@ class TestECMCommon(unittest.TestCase):
             actual = inv_multi(element_list, n)
         self.assertEqual(gcd(cm_target.exception.x, n), 65537)
         self.assertEqual(gcd(cm_actual.exception.x, n), 65537)
+
+    def test_inv_power(self):
+        self.assertIsNone(inv_power(63, 3))
+        self.assertEqual(inv_power(64, 3), 4)
+        self.assertIsNone(inv_power(65, 3))
+        self.assertEqual(inv_power(12 ** 6, 2), 1728)
+        self.assertEqual(inv_power(2 ** 20000, 20000), 2)
 
 
 if __name__ == "__main__":

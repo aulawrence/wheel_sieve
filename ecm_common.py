@@ -124,3 +124,38 @@ def inv_multi(element_list, n):
             inv_element = element_tree[(i - 1) // 2] * element_tree[i + 1] % n
         inv_dict[element] = inv_element
     return inv_dict
+
+
+def inv_power(x, d):
+    """Computes the d-th root of x if it is an integer.
+    x must be >= 0 and d must be >= 1.
+
+    Args:
+        x (int): x.
+        d (int): d.
+
+    Raises:
+        ValueError: Thrown when x < 0 or d < 1.
+
+    Returns:
+        int: The d-th root of x if it is an integer, otherwise None.
+    """
+    if x < 0 or d < 1:
+        raise ValueError
+    if x == 0:
+        return 0
+    # Since 2 ** b <= x < 2 ** (b + 1)
+    # We get 2 ** (b//d) <= x ** (1/d) < 2 ** ((b + 1)/d) <= 2 ** (b//d + 1)
+    b = x.bit_length() - 1
+    low = 1 << (b // d)
+    high = 1 << (b // d + 1)
+    while low < high:
+        mid = (low + high) // 2
+        if x < mid ** d:
+            high = mid
+        else:
+            low = mid + 1
+    x_d = low - 1
+    if x_d ** d == x:
+        return x_d
+    return None
