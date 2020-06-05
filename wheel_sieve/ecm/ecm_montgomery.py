@@ -2,7 +2,7 @@ import random
 import time
 from gmpy2 import mpz, gcd
 import numpy as np
-from ecm_common import PRIME_GEN, InverseNotFound, CurveInitFail, inv, init_wheel
+from wheel_sieve.common import PRIME_GEN, InverseNotFound, CurveInitFail, inv, init_wheel
 
 
 def get_curve_suyama(sigma, n):
@@ -92,8 +92,8 @@ def add_pt(ptp, ptq, pt_, curve):
     A, s, n = curve
     u = (xp - zp) * (xq + zq) % n
     v = (xp + zp) * (xq - zq) % n
-    xr = z_ * (u + v) ** 2 % n
-    zr = x_ * (u - v) ** 2 % n
+    xr = z_ * ((u + v) ** 2 % n) % n
+    zr = x_ * ((u - v) ** 2 % n) % n
     return (xr, zr)
 
 
@@ -164,7 +164,7 @@ def dbl_pt(pt, curve):
     b = (x - z) ** 2 % n
     t = a - b
     xr = a * b % n
-    zr = t * (b + s * t) % n
+    zr = t * ((b + s * t) % n) % n
     return (xr, zr)
 
 

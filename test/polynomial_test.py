@@ -1,6 +1,6 @@
 import random
 import unittest
-from polynomial import Polynomial, inv
+from wheel_sieve.polynomial import Polynomial, inv
 
 
 def mul(a, b, n):

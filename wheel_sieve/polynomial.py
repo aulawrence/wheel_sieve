@@ -1,5 +1,5 @@
 from gmpy2 import mpz, xmpz
-from ecm_common import inv
+from wheel_sieve.common import inv
 
 
 class Polynomial(object):

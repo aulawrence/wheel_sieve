@@ -1,5 +1,5 @@
 import unittest
-from ecm_weierstrass import get_curve, mul_pt_exn, mul_pt_multi, InverseNotFound, gcd
+from wheel_sieve.ecm.ecm_weierstrass import get_curve, mul_pt_exn, mul_pt_multi, InverseNotFound, gcd
 
 
 class TestECMWeierstrass(unittest.TestCase):
