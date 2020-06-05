@@ -1,5 +1,5 @@
 from math import gcd
-from gmpy2 import divm, iroot
+from gmpy2 import invert, iroot
 import numpy as np
 from wheel_sieve.wheel_sieve_byte import PRIME_GEN, wheel_sieve
 
@@ -37,7 +37,7 @@ def inv(x, n):
         int: Inverse of x.
     """
     try:
-        return divm(1, x, n)
+        return invert(x, n)
     except ZeroDivisionError:
         raise InverseNotFound(x % n, n)
 

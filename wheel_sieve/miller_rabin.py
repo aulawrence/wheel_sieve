@@ -1,4 +1,5 @@
 import random
+from gmpy2 import powmod as gmpy2_powmod
 import numpy as np
 from wheel_sieve.wheel_sieve_byte import PRIME_GEN
 
@@ -14,7 +15,7 @@ def powmod(x, r, n):
     Returns:
         int: (x ** r) % n
     """
-    return pow(x, r, n)
+    return gmpy2_powmod(x, r, n)
 
 
 def witness_uniform(n, k):
