@@ -2,7 +2,7 @@ import random
 import time
 from math import gcd
 import numpy as np
-from ecm_common import PRIME_GEN, InverseNotFound, inv, inv_multi
+from wheel_sieve.ecm_common import PRIME_GEN, InverseNotFound, inv, inv_multi
 
 
 def get_curve(pt0, a, n):

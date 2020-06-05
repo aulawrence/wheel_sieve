@@ -1,5 +1,5 @@
 import numpy as np
-from wheel_sieve_byte import PRIME_GEN
+from wheel_sieve.wheel_sieve_byte import PRIME_GEN
 
 # Memory (bytes) used in sieving numpy array
 MEM = 8_000_000

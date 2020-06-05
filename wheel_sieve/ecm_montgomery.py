@@ -2,7 +2,7 @@ import random
 import time
 from math import gcd
 import numpy as np
-from ecm_common import PRIME_GEN, InverseNotFound, CurveInitFail, inv, init_wheel
+from wheel_sieve.ecm_common import PRIME_GEN, InverseNotFound, CurveInitFail, inv, init_wheel
 
 
 def get_curve_suyama(sigma, n):

@@ -1,5 +1,5 @@
 import unittest
-from ecm_common import inv, inv_multi, inv_power, gcd, InverseNotFound
+from wheel_sieve.ecm_common import inv, inv_multi, inv_power, gcd, InverseNotFound
 
 
 class TestECMCommon(unittest.TestCase):

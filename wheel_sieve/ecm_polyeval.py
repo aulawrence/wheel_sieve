@@ -2,11 +2,11 @@ import random
 import time
 from math import gcd
 import numpy as np
-from ecm_common import PRIME_GEN, InverseNotFound, CurveInitFail
-from polynomial import Polynomial
-import ecm_montgomery as mnt
-import ecm_weierstrass as wst
-from ecm_brent_suyama import apply_polynomial, get_difference_seq, step_difference_seq_exn
+from wheel_sieve.ecm_common import PRIME_GEN, InverseNotFound, CurveInitFail
+from wheel_sieve.ecm_brent_suyama import apply_polynomial, get_difference_seq, step_difference_seq_exn
+from wheel_sieve.polynomial import Polynomial
+import wheel_sieve.ecm_montgomery as mnt
+import wheel_sieve.ecm_weierstrass as wst
 
 
 def product_tree(poly_list, n):
