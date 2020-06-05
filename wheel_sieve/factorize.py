@@ -105,7 +105,7 @@ def factorize(n, witness=witness_prime(100)):
                             power_i += power_j
                         if factor_j > 1:
                             working_dict[factor_j] += power_j
-            prime_factors[factor_i] = power_i
+            prime_factors[int(factor_i)] = power_i
         else:
             factor, power = factor_power(factor_i, factor_i.bit_length() // 10 + 1)
             if factor is not None:
@@ -122,7 +122,7 @@ def factorize(n, witness=witness_prime(100)):
                 working_dict[factor_i // factor] += power_i
                 working_dict[factor] += power_i
                 continue
-            remaining_factors[factor_i] += power_i
+            remaining_factors[int(factor_i)] += power_i
     return prime_factors, dict(remaining_factors)
 
 

@@ -1,5 +1,5 @@
 from math import gcd
-from gmpy2 import divm
+from gmpy2 import divm, iroot
 import numpy as np
 from wheel_sieve.wheel_sieve_byte import PRIME_GEN, wheel_sieve
 
@@ -138,18 +138,7 @@ def inv_power(x, d):
         raise ValueError
     if x == 0:
         return 0
-    # Since 2 ** b <= x < 2 ** (b + 1)
-    # We get 2 ** (b//d) <= x ** (1/d) < 2 ** ((b + 1)/d) <= 2 ** (b//d + 1)
-    b = x.bit_length() - 1
-    low = 1 << (b // d)
-    high = 1 << (b // d + 1)
-    while low < high:
-        mid = (low + high) // 2
-        if x < mid ** d:
-            high = mid
-        else:
-            low = mid + 1
-    x_d = low - 1
-    if x_d ** d == x:
+    x_d, is_perfect = iroot(x, d)
+    if is_perfect:
         return x_d
     return None
