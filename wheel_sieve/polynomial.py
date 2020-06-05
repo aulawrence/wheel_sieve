@@ -1,4 +1,4 @@
-from wheel_sieve.ecm_common import inv
+from wheel_sieve.common import inv
 
 
 class Polynomial(object):

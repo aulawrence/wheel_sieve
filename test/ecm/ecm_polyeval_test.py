@@ -1,6 +1,6 @@
 import random
 import unittest
-from wheel_sieve.ecm_polyeval import Polynomial, product_tree, recip_tree, remainder_tree
+from wheel_sieve.ecm.ecm_polyeval import Polynomial, product_tree, recip_tree, remainder_tree
 
 
 def product_loop(f_list):

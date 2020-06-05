@@ -2,9 +2,9 @@ import random
 import time
 from math import gcd
 import numpy as np
-from wheel_sieve.ecm_common import PRIME_GEN, InverseNotFound, CurveInitFail, init_wheel, inv, inv_multi
-import wheel_sieve.ecm_montgomery as mnt
-import wheel_sieve.ecm_weierstrass as wst
+from wheel_sieve.common import PRIME_GEN, InverseNotFound, CurveInitFail, init_wheel, inv, inv_multi
+import wheel_sieve.ecm.ecm_montgomery as mnt
+import wheel_sieve.ecm.ecm_weierstrass as wst
 
 
 def apply_polynomial(coeff, x):

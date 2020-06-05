@@ -1,8 +1,8 @@
 from collections import defaultdict
 import random
-from miller_rabin import miller_rabin, witness_prime
-from wheel_sieve.ecm_common import PRIME_GEN, inv_power
-from wheel_sieve.ecm_polyeval import ecm
+from wheel_sieve.miller_rabin import miller_rabin, witness_prime
+from wheel_sieve.common import PRIME_GEN, inv_power
+from wheel_sieve.ecm.ecm_polyeval import ecm
 
 
 def factor_small_primes(n, ubound):
