@@ -1,3 +1,5 @@
+"""Prime sieve with wheel factorization. Uses bitarray.
+"""
 import numpy as np
 from wheel_sieve.wheel_sieve_byte import PRIME_GEN
 

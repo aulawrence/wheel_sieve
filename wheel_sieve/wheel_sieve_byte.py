@@ -1,3 +1,5 @@
+"""Prime sieve with wheel factorization.
+"""
 import numpy as np
 
 # Memory (bytes) used in sieving numpy array

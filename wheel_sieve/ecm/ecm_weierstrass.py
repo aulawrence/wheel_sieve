@@ -1,3 +1,5 @@
+"""Elliptic Curve Method using Wererstrass Curves.
+"""
 import random
 import time
 from math import gcd

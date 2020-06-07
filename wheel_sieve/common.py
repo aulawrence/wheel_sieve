@@ -1,3 +1,5 @@
+"""Common modular arithmetic functions.
+"""
 from math import gcd
 import numpy as np
 from wheel_sieve.wheel_sieve_byte import PRIME_GEN, wheel_sieve

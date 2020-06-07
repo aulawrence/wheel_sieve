@@ -1,3 +1,5 @@
+"""Miler-Rabin primality test.
+"""
 import random
 import numpy as np
 from wheel_sieve.wheel_sieve_byte import PRIME_GEN

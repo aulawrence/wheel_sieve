@@ -1,3 +1,5 @@
+"""Pollard's Rho Algorithm on finding a factor of an integer.
+"""
 from math import gcd
 
 

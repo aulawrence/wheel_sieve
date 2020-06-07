@@ -1,3 +1,5 @@
+"""Elliptic Curve Method using Montgomery Curves.
+"""
 import random
 import time
 from math import gcd

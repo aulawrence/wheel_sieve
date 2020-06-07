@@ -1,3 +1,5 @@
+"""Elliptic Curve Method with Brent-Suyama Extension.
+"""
 import random
 import time
 from math import gcd

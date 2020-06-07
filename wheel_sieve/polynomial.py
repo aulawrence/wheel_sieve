@@ -1,3 +1,5 @@
+"""Polynomial arithmetic (mod n).
+"""
 from wheel_sieve.common import inv
 
 

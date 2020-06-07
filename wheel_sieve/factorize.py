@@ -1,3 +1,5 @@
+"""Integer factorization using ECM.
+"""
 from collections import defaultdict
 import random
 from wheel_sieve.miller_rabin import miller_rabin, witness_prime
