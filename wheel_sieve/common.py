@@ -12,7 +12,9 @@ class InverseNotFound(Exception):
     """
 
     def __init__(self, x, n):
-        super(InverseNotFound, self).__init__("Inverse of {0:d} (mod {1:d}) not found.".format(x, n))
+        super(InverseNotFound, self).__init__(
+            "Inverse of {0:d} (mod {1:d}) not found.".format(x, n)
+        )
         self.x = x
         self.n = n
 
@@ -102,7 +104,7 @@ def inv_multi(element_list, n):
         return inv_dict
     k = 1 << (d - 1).bit_length()
     element_tree = [None] * (k - 1) + [1] * k
-    element_tree[k - 1:k + d - 1] = element_list
+    element_tree[k - 1 : k + d - 1] = element_list
     while k > 1:
         for i in range(k // 2 - 1, k - 1):
             element_tree[i] = element_tree[2 * i + 1] * element_tree[2 * i + 2] % n

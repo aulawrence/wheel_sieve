@@ -25,7 +25,11 @@ def wheel_sieve_count(lbound, ubound, p_list=(2, 3, 5)):
     wheel = 1
     for wheel_prime in p_list:
         wheel *= wheel_prime
-    k_list = [k for k in range(1, wheel) if all(k % wheel_prime != 0 for wheel_prime in p_list)]
+    k_list = [
+        k
+        for k in range(1, wheel)
+        if all(k % wheel_prime != 0 for wheel_prime in p_list)
+    ]
     kl_list = {k: [k_list.index(k * l % wheel) for l in k_list] for k in k_list}
     # Count primes between lbound and max(p_list)
     count = 0
@@ -70,6 +74,7 @@ CLEAR_BIT_FROM = (
 
 # [sum(c == "1" for c in "{:>08}".format(bin(np.uint8(x))[2:])) for x in range(256)]
 
+# fmt: off
 BIT_COUNT = np.array([
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
@@ -88,6 +93,7 @@ BIT_COUNT = np.array([
     3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
     4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
 ])
+# fmt: on
 
 
 def _wheel_sieve_bit(lbound, ubound, wheel, k_list, kl_list):
@@ -126,6 +132,7 @@ def _wheel_sieve_bit(lbound, ubound, wheel, k_list, kl_list):
 
 if __name__ == "__main__":
     import time
+
     START = time.time()
     print(wheel_sieve_count(1, 1_000_000_000))
     # print(wheel_sieve_count(1,4_000_000_000))

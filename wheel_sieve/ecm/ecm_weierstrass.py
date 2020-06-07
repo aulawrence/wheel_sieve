@@ -17,7 +17,7 @@ def get_curve(pt0, a, n):
         tuple(int, int, int): (a, b, n) representing the Elliptic Curve y**2 = x**3 + a*x + b (mod n).
     """
     x0, y0 = pt0
-    b = (y0**2 - x0**3 - a * x0) % n
+    b = (y0 ** 2 - x0 ** 3 - a * x0) % n
     return (a, b, n)
 
 
@@ -31,7 +31,7 @@ def get_delta(curve):
         int: The discriminant.
     """
     a, b, n = curve
-    delta = (4 * a**3 + 27 * b**2) % n
+    delta = (4 * a ** 3 + 27 * b ** 2) % n
     return gcd(delta, n) % n
 
 

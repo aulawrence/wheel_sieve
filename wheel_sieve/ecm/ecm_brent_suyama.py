@@ -2,7 +2,14 @@ import random
 import time
 from math import gcd
 import numpy as np
-from wheel_sieve.common import PRIME_GEN, InverseNotFound, CurveInitFail, init_wheel, inv, inv_multi
+from wheel_sieve.common import (
+    PRIME_GEN,
+    InverseNotFound,
+    CurveInitFail,
+    init_wheel,
+    inv,
+    inv_multi,
+)
 import wheel_sieve.ecm.ecm_montgomery as mnt
 import wheel_sieve.ecm.ecm_weierstrass as wst
 
@@ -60,7 +67,10 @@ def step_difference_seq_exn(pt_list, curve):
         curve (curve): Curve in Weierstrass form.
     """
     a, b, n = curve
-    gen_list = [wst.add_pt_gen(pt_list[i], pt_list[i + 1], curve) for i in range(len(pt_list) - 1)]
+    gen_list = [
+        wst.add_pt_gen(pt_list[i], pt_list[i + 1], curve)
+        for i in range(len(pt_list) - 1)
+    ]
     denom_list = [gen.send(None) for gen in gen_list]
     denom_set = set()
     for denom in denom_list:
@@ -130,16 +140,20 @@ def ecm(n, rounds, b1, b2):
             c1 = b1 // wheel
             c2 = b2 // wheel + 2
             c = 0
-            k_ls = [apply_polynomial(polynomial, j) for j in j_list] + get_difference_seq(polynomial, c1 * wheel, wheel)
+            k_ls = [
+                apply_polynomial(polynomial, j) for j in j_list
+            ] + get_difference_seq(polynomial, c1 * wheel, wheel)
             mul_res = wst.mul_pt_multi(q, wst_curve, k_ls)
             xj_list = []
             for i in range(len(j_list)):
                 xj_list.append(mul_res[i][0])
-            cq_list = mul_res[len(j_list):]
+            cq_list = mul_res[len(j_list) :]
             while c < c2 - c1:
                 # assert cq_list[0] == wst.mul_pt_exn(q, wst_curve, apply_polynomial(polynomial, (c + c1) * wheel))
                 s = cq_list[0][1] if cq_list[0][1] != 0 else 1
-                for xj, is_prime in zip(xj_list, np.unpackbits(prime_array[c, :], bitorder="little")):
+                for xj, is_prime in zip(
+                    xj_list, np.unpackbits(prime_array[c, :], bitorder="little")
+                ):
                     if is_prime:
                         t = (cq_list[0][0] - xj) % n
                         if t != 0:

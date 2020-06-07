@@ -3,7 +3,11 @@ import time
 from math import gcd
 import numpy as np
 from wheel_sieve.common import PRIME_GEN, InverseNotFound, CurveInitFail
-from wheel_sieve.ecm.ecm_brent_suyama import apply_polynomial, get_difference_seq, step_difference_seq_exn
+from wheel_sieve.ecm.ecm_brent_suyama import (
+    apply_polynomial,
+    get_difference_seq,
+    step_difference_seq_exn,
+)
 from wheel_sieve.polynomial import Polynomial
 import wheel_sieve.ecm.ecm_montgomery as mnt
 import wheel_sieve.ecm.ecm_weierstrass as wst
@@ -94,7 +98,9 @@ def remainder_tree(f, g_tree, g_recip_tree, n):
             di = len(gi.coeff) - 1
             hi = (f_mod_g[di:] * gi_recip)[di:]
             f_mod_gi = f_mod_g - gi * hi
-            if len(f_mod_gi.coeff) < len(gi.coeff) or (len(f_mod_gi.coeff) == 1 and f_mod_gi.coeff[0] == 0):
+            if len(f_mod_gi.coeff) < len(gi.coeff) or (
+                len(f_mod_gi.coeff) == 1 and f_mod_gi.coeff[0] == 0
+            ):
                 break
             f_mod_g = f_mod_gi
         f_mod_g_tree.append(f_mod_gi)
@@ -171,12 +177,14 @@ def ecm(n, rounds, b1, b2, wheel=2310, output=True):
             c1 = b1 // wheel
             c2 = b2 // wheel + 2
             c = 0
-            k_ls = [apply_polynomial(polynomial, j) for j in j_list] + get_difference_seq(polynomial, c1 * wheel, wheel)
+            k_ls = [
+                apply_polynomial(polynomial, j) for j in j_list
+            ] + get_difference_seq(polynomial, c1 * wheel, wheel)
             mul_res = wst.mul_pt_multi(q, wst_curve, k_ls)
             xj_list = []
             for i in range(len(j_list)):
                 xj_list.append(mul_res[i][0])
-            cq_list = mul_res[len(j_list):]
+            cq_list = mul_res[len(j_list) :]
             f_tree = product_tree([Polynomial([n - xj, 1], n) for xj in xj_list], n)
             f_recip_tree = recip_tree(f_tree)
             H = Polynomial([1], n)
@@ -194,7 +202,7 @@ def ecm(n, rounds, b1, b2, wheel=2310, output=True):
             if 1 < res < n:
                 return res
             elif res == n:
-                for rem in rem_tree[len(rem_tree) // 2:]:
+                for rem in rem_tree[len(rem_tree) // 2 :]:
                     res = gcd(rem, n)
                     if 1 < res < n:
                         return res

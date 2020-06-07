@@ -78,4 +78,5 @@ if __name__ == "__main__":
 
     def g(x):
         return (x * x + 3) % n
+
     print(pollard2(x, g, n))

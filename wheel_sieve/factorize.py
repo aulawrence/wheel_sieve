@@ -112,10 +112,34 @@ def factorize(n, witness=witness_prime(100)):
                 working_dict[factor] += power_i * power
                 continue
             ecm_kwargs_list = [
-                {"rounds": 10,  "b1": 2_000,   "b2": 50_000,     "wheel": 210,  "output": False},
-                {"rounds": 40,  "b1": 11_000,  "b2": 600_000,    "wheel": 2310, "output": False},
-                {"rounds": 100, "b1": 50_000,  "b2": 4_000_000,  "wheel": 2310, "output": False},
-                {"rounds": 200, "b1": 250_000, "b2": 40_000_000, "wheel": 2310, "output": False},
+                {
+                    "rounds": 10,
+                    "b1": 2_000,
+                    "b2": 50_000,
+                    "wheel": 210,
+                    "output": False,
+                },
+                {
+                    "rounds": 40,
+                    "b1": 11_000,
+                    "b2": 600_000,
+                    "wheel": 2310,
+                    "output": False,
+                },
+                {
+                    "rounds": 100,
+                    "b1": 50_000,
+                    "b2": 4_000_000,
+                    "wheel": 2310,
+                    "output": False,
+                },
+                {
+                    "rounds": 200,
+                    "b1": 250_000,
+                    "b2": 40_000_000,
+                    "wheel": 2310,
+                    "output": False,
+                },
             ]
             factor = factor_ecm(factor_i, ecm_kwargs_list, seed=2)
             if factor is not None:
@@ -127,4 +151,4 @@ def factorize(n, witness=witness_prime(100)):
 
 
 if __name__ == "__main__":
-    print(factorize((2 ** 256 - 1) * (2**64 - 1) ** 3))
+    print(factorize((2 ** 256 - 1) * (2 ** 64 - 1) ** 3))

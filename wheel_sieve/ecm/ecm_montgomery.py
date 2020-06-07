@@ -2,7 +2,13 @@ import random
 import time
 from math import gcd
 import numpy as np
-from wheel_sieve.common import PRIME_GEN, InverseNotFound, CurveInitFail, inv, init_wheel
+from wheel_sieve.common import (
+    PRIME_GEN,
+    InverseNotFound,
+    CurveInitFail,
+    inv,
+    init_wheel,
+)
 
 
 def get_curve_suyama(sigma, n):
@@ -29,7 +35,7 @@ def get_curve_suyama(sigma, n):
     v = 4 * sigma % n
     x0 = u ** 3 % n
     z0 = v ** 3 % n
-    A = ((v - u) ** 3 * (3 * u + v) * inv(4 * u**3 * v, n) - 2) % n
+    A = ((v - u) ** 3 * (3 * u + v) * inv(4 * u ** 3 * v, n) - 2) % n
     if A in (n - 2, 2):
         raise CurveInitFail()
     s = (A + 2) * inv(4, n) % n
@@ -294,7 +300,9 @@ def ecm(n, rounds, b1, b2):
             cq_ = mul_pt_exn(q, curve, (c1 - 1) * wheel)
             while c < c2 - c1:
                 s = 1
-                for xj, is_prime in zip(xj_list, np.unpackbits(prime_array[c, :], bitorder="little")):
+                for xj, is_prime in zip(
+                    xj_list, np.unpackbits(prime_array[c, :], bitorder="little")
+                ):
                     if is_prime:
                         t = (xj * cq[1] - cq[0]) % n
                         if t != 0:

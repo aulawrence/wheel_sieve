@@ -66,9 +66,9 @@ def miller_rabin(n, witness_list):
               True indicates possible prime
               False indicates composite
     """
-    if (n == 2 or n == 3):
+    if n == 2 or n == 3:
         return True
-    elif (n < 5 or n % 2 == 0):
+    elif n < 5 or n % 2 == 0:
         return False
     r = 0
     d = n - 1
@@ -116,6 +116,6 @@ def probable_primes(n, d, ubound, witness_list):
 if __name__ == "__main__":
     random.seed(2)
     d = 10000
-    n = random.randint(3 * 2**2046, 2**2048 - d - 1)
+    n = random.randint(3 * 2 ** 2046, 2 ** 2048 - d - 1)
     for v in probable_primes(n, d, 3000, witness_prime(1000)):
         print(v)
