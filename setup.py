@@ -3,9 +3,6 @@ import setuptools
 with open("README.md", "r") as f:
     long_description = f.read()
 
-with open("LICENSE", "r") as f:
-    license_string = f.read()
-
 setuptools.setup(
     name="wheel_sieve",
     version="0.0.1",
@@ -14,7 +11,7 @@ setuptools.setup(
     description="Wheel Sieve and More",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    license=license_string,
+    license="MIT",
     url="https://github.com/aulawrence/wheel_sieve",
     packages=["wheel_sieve"],
     classifiers=[
