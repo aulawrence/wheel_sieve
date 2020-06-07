@@ -22,12 +22,12 @@ def product_tree(poly_list, n):
     The value of each internal node is the product of its children.
 
     Args:
-        poly_list (list of Polynomial): List of polynomials to multiply.
+        poly_list (list(Polynomial)): List of polynomials to multiply.
         n (int): Modulus.
 
     Returns:
-        list of Polynomial: The Product Tree, a complete binary tree in list form.
-            The root node is at position 0 of the list. The children of node i are node 2*i+1 and node 2*i+2.
+        list(Polynomial): The Product Tree, a complete binary tree in list form.
+        The root node is at position 0 of the list. The children of node i are node 2*i+1 and node 2*i+2.
     """
     poly_num = len(poly_list)
     k = 1
@@ -49,12 +49,14 @@ def recip_tree(prod_tree):
     """Recip Tree Algorithm. Compute the reciprocal polynomail of each element in the given product tree.
 
     Args:
-        prod_tree (list of Polynomial): Product Tree.
+        prod_tree (list(Polynomial)): Product Tree.
 
     Returns:
-        list of Polynomial: The Recip Tree, a complete binary tree in list form.
-            The root node is at position 0 of the list. The children of node i are node 2*i+1 and node 2*i+2.
-            r_tree[i] = prod_tree[i].recip()
+        list(Polynomial): The Recip Tree, a complete binary tree in list form.
+        The root node is at position 0 of the list. The children of node i are node 2*i+1 and node 2*i+2.
+         
+         -  r_tree[i] = prod_tree[i].recip()
+
     """
     r_tree = [prod_tree[0].recip()]
     for i in range(len(prod_tree) // 2):
@@ -73,20 +75,23 @@ def recip_tree(prod_tree):
 def remainder_tree(f, g_tree, g_recip_tree, n):
     """Remainder Tree Algorithm. Given polynomials f, g_1, g_2, ..., g_m where g_i(x) = x - x_i,
     use a product tree to compute :math:\prod_{i=0}^{m}(f \mod g_i) \mod n, which is :math:\prod_{i=0}^{m} f(x_i) \mod n.
+    
     If one f(x_i) is zero, the product will be zero. To prevent this, a slight change is added to omit those terms from the product.
+    
     The leaf nodes are populated by f mod g_i, which is f(x_i). If the length of poly_list is not a power of 2,
     the remaining leaf nodes takes the value of 1.
+    
     The value of each internal node is the product of its children mod n.
 
     Args:
         f (Polynomial): Polynomial f.
-        g_tree (list of Polynomial): Product Tree of polynomial [g_1, g_2, ..., g_m]. Each of g_i is assumed to be of degree 1.
-        g_recip_tree (list of Polynomial): Recip Tree of g_tree.
+        g_tree (list(Polynomial)): Product Tree of polynomial [g_1, g_2, ..., g_m]. Each of g_i is assumed to be of degree 1.
+        g_recip_tree (list(Polynomial)): Recip Tree of g_tree.
         n (int): Modolus.
 
     Returns:
-        list of Polynomial: The Remainder Tree, a complete binary tree in list form.
-            The root node is at position 0 of the list. The children of node i are node 2*i+1 and node 2*i+2.
+        list(Polynomial): The Remainder Tree, a complete binary tree in list form.
+        The root node is at position 0 of the list. The children of node i are node 2*i+1 and node 2*i+2.
     """
     f_mod_g_tree = []
     for i in range(len(g_tree)):
@@ -122,11 +127,12 @@ def remainder_tree(f, g_tree, g_recip_tree, n):
 
 
 def ecm(n, rounds, b1, b2, wheel=2310, output=True):
-    """Elliptic Curve Factorization Method.
-    For each round:
+    """Elliptic Curve Factorization Method. In each round, the following steps are performed:
+
         0. Generate random point and curve.
         1. Repeatedly multiply the current point by small primes raised to some power, determined by b1.
         2. Standard continuation from b1 to b2 with Brent-Suyama's Extension and Polyeval.
+    
     Returns when a non-trivial factor is found.
 
     Args:

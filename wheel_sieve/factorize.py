@@ -8,7 +8,7 @@ from wheel_sieve.ecm.ecm_polyeval import ecm
 
 
 def factor_small_primes(n, ubound):
-    """Factor n with small primes into n = \\prod{i} {p_i}^{d_{p_i}} * x.
+    """Factor n with small primes into :math:`n = \\prod_{i} {p_i}^{d_{p_i}} * x`.
 
     Args:
         n (int): Number to be factored.
@@ -16,8 +16,9 @@ def factor_small_primes(n, ubound):
 
     Returns:
         tuple(dict, int): (prime_factors, x), where
-            prime_factors: dict(int, int) mapping p_i to d_{p_i},
-            x: (int) x.
+
+         -  **prime_factors** dict(int, int): mapping :math:`p_i` to :math:`d_{p_i}`.
+         -  **x** (int): Integer x.
 
     """
     prime_factors = dict()
@@ -34,7 +35,7 @@ def factor_small_primes(n, ubound):
 
 def factor_power(n, ubound):
     """Find a factor of n if n is a perfect k-th power for some k < ubound.
-    i.e. n = d ^ k for some integers d, k, where k >= 2.
+    i.e. :math:`n = d^k` for some integers d, k, where k >= 2.
 
     Args:
         n (int): Number to be factored.
@@ -55,7 +56,7 @@ def factor_ecm(n, ecm_kwargs_list, seed=None):
 
     Args:
         n (int): Number to be factored.
-        ecm_kwargs_list (list of dict): List of dicts containing keyword arguments to be passed to ecm call.
+        ecm_kwargs_list (list(dict)): List of dicts containing keyword arguments to be passed to ecm call.
         seed (int, optional): Random seed to be set every ecm call. Defaults to None.
 
     Returns:
@@ -71,21 +72,23 @@ def factor_ecm(n, ecm_kwargs_list, seed=None):
 
 
 def factorize(n, witness=witness_prime(100)):
-    """Factorize a number n, where n >= 2, with ECM into n = \\prod{i} {p_i}^{d_{p_i}} * \\prod{j} {f_j}^{d_{f_j}}.
-    Each p_i passes the Miller Rabin Primality Test and is (probably) prime.
-    Each f_j are known composite that cannot be factored because we try a fixed number of curves.
+    """Factorize a number n, where n >= 2, with ECM into :math:`n = \\prod_{i} {p_i}^{d_{p_i}} * \\prod_{j} {f_j}^{d_{f_j}}`.
+    Each :math:`p_i` passes the Miller Rabin Primality Test and is (probably) prime.
+    Each :math:`f_j` are known composite that cannot be factored because we try a fixed number of curves.
 
     Args:
         n (int): Integer to factorize.
-        witness (list of int, optional): Witness to be used in Miller Rabin Primality Test. Defaults to witness_prime(100).
+        witness (list(int), optional): Witness to be used in Miller Rabin Primality Test. Defaults to witness_prime(100).
 
     Raises:
         ValueError: Thrown when n < 2
 
     Returns:
         tuple(dict, dict): (prime_factors, remaining_factors), where
-            prime_factors: dict(int, int) mapping p_i to d_{p_i},
-            remaining_factors: dict(int, int) mapping f_j to d_{f_j}.
+
+         -  **prime_factors** dict(int, int): mapping :math:`p_i` to :math:`d_{p_i}`.
+         -  **remaining_factors** dict(int, int): mapping :math:`f_j` to :math:`d_{f_j}`.
+         
     """
     if n < 2:
         raise ValueError

@@ -15,7 +15,7 @@ from wheel_sieve.common import (
 
 def get_curve_suyama(sigma, n):
     """Given parameter sigma, generate an Elliptic Curve (mod n) and a point on it using Suyama's parametrization.
-       The constructed curve's group order is a multiple of 12, compared to 4 guaranteed for Montgomery Curves.
+    The constructed curve's group order is a multiple of 12, compared to 4 guaranteed for Montgomery Curves.
 
     Args:
         sigma (int): The sigma parameter.
@@ -26,10 +26,13 @@ def get_curve_suyama(sigma, n):
 
     Returns:
         tuple(tuple(int, int), tuple(int, int, int)): (Point, Curve), where
-            Point = (x0, z0) in projective coordinates ignoring y.
-            Curve = (A, s, n), representing B * (y/z) ** 2 == (x/z) ** 3 + A * (x/z) ** 2 + (x/z) (mod n),
-                    ignoring B and y.
-                    s = (A+2)/4 % n is precomputed for point doubling.
+
+         -  Point = (x0, z0) in projective coordinates ignoring y.
+         -  Curve = (A, s, n), representing B * (y/z) ** 2 == (x/z) ** 3 + A * (x/z) ** 2 + (x/z) (mod n),
+            ignoring B and y.
+            
+             -  s = (A+2)/4 % n is precomputed for point doubling.
+
     """
     if sigma % n in (n - 5, n - 3, n - 1, 0, 1, 3, 5) or sigma * 3 % n in (n - 5, 5):
         raise CurveInitFail()
@@ -63,10 +66,13 @@ def get_curve_a(x, A, n):
 
     Returns:
         tuple(tuple(int, int), tuple(int, int, int)): (Point, Curve), where
-            Point = (x0, z0) in projective coordinates ignoring y.
-            Curve = (A, s, n), representing B * (y/z) ** 2 == (x/z) ** 3 + A * (x/z) ** 2 + (x/z) (mod n),
-                    ignoring B and y.
-                    s = (A+2)/4 % n is precomputed for point doubling.
+
+         -  Point = (x0, z0) in projective coordinates ignoring y.
+         -  Curve = (A, s, n), representing B * (y/z) ** 2 == (x/z) ** 3 + A * (x/z) ** 2 + (x/z) (mod n),
+            ignoring B and y.
+
+             -  s = (A+2)/4 % n is precomputed for point doubling.
+
     """
     if A % n in (n - 2, 2):
         raise CurveInitFail()
@@ -83,7 +89,7 @@ def get_curve_a(x, A, n):
 
 def add_pt(ptp, ptq, pt_, curve):
     """Computes point P+Q given points P, Q and P-Q, and curve.
-       Does not return correct result when P == Q, use dbl_pt instead.
+    Does not return correct result when P == Q, use dbl_pt instead.
 
     Args:
         ptp (tuple(int, int)): Point P.
@@ -92,7 +98,7 @@ def add_pt(ptp, ptq, pt_, curve):
         curve (tuple(int, int, int)): Curve.
 
     Returns:
-        (tuple(int, int)): Point P+Q.
+        tuple(int, int): Point P+Q.
     """
     xp, zp = ptp
     xq, zq = ptq
@@ -107,10 +113,11 @@ def add_pt(ptp, ptq, pt_, curve):
 
 def to_weierstrass(pt, curve):
     """Given a point P and an Montgomery Curve it is on, computes the equivalent point and curve in weierstrass form.
+
     Note: Multiple calls for same curve with different P will produce different output curves. This
-        is due to y-coordinates being omitted in the representation. Without the ability to square-root
-        y (mod n) by fixing B, the natural thing to do is to fix y and calculate B. So different point P
-        produces different B.
+    is due to y-coordinates being omitted in the representation. Without the ability to square-root
+    y (mod n) by fixing B, the natural thing to do is to fix y and calculate B. So different point P
+    produces different B.
 
     Args:
         pt (tuple(int, int)): Point P in XZ form.
@@ -118,8 +125,10 @@ def to_weierstrass(pt, curve):
 
     Returns:
         tuple(tuple(int, int), tuple(int, int, int)): (Point, Curve), where
-            Point = (t, v) in XY form.
-            Curve = (a, b, n) representing the Elliptic Curve y**2 = x**3 + a*x + b (mod n).
+
+         -  Point = (t, v) in XY form.
+         -  Curve = (a, b, n) representing the Elliptic Curve y**2 = x**3 + a*x + b (mod n).
+
     """
     x, z = pt
     A, s, n = curve
@@ -139,7 +148,7 @@ def to_weierstrass(pt, curve):
 
 def add_pt_exn(ptp, ptq, pt_, curve):
     """Computes point P+Q given points P, Q and P-Q, and curve.
-       Does not return correct result when P == Q, use dbl_pt instead.
+    Does not return correct result when P == Q, use dbl_pt instead.
 
     Args:
         ptp (tuple(int, int)): Point P.
@@ -151,7 +160,7 @@ def add_pt_exn(ptp, ptq, pt_, curve):
         InverseNotFound: Thrown when point P+Q is the point at infinity.
 
     Returns:
-        (tuple(int, int)): Point P+Q.
+        tuple(int, int): Point P+Q.
     """
     return check(add_pt(ptp, ptq, pt_, curve), curve)
 
@@ -164,7 +173,7 @@ def dbl_pt(pt, curve):
         curve (tuple(int, int, int)): Curve.
 
     Returns:
-        (tuple(int, int)): Point 2P.
+        tuple(int, int): Point 2P.
     """
     x, z = pt
     A, s, n = curve
@@ -188,7 +197,7 @@ def mul_pt_exn(pt, curve, k):
         InverseNotFound: Thrown when point kP is the point at infinity.
 
     Returns:
-        (tuple(int, int)): Point kP.
+        tuple(int, int): Point kP.
     """
     if k <= 2:
         if k < 0:
@@ -220,7 +229,6 @@ def mul_pt_exn(pt, curve, k):
 
 def check(pt, curve):
     """Given point P (x, z), check that P is not the point at infinity, i.e. gcd(z, n) == 1, and return P.
-       If gcd(z, n) > 1, throws InverseNotFound.
 
     Args:
         pt (tuple(int, int)): Point P.
@@ -240,11 +248,12 @@ def check(pt, curve):
 
 
 def ecm(n, rounds, b1, b2):
-    """Elliptic Curve Factorization Method.
-    For each round:
+    """Elliptic Curve Factorization Method. In each round, the following steps are performed:
+
         0. Generate random point and curve.
         1. Repeatedly multiply the current point by small primes raised to some power, determined by b1.
         2. Repeatedly try to multiply the point from step 1 by primes (with wheel of 2310) between b1 and b2.
+
     Returns when a non-trivial factor is found.
 
     Args:

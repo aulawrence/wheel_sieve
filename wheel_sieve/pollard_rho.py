@@ -5,7 +5,7 @@ from math import gcd
 
 def pollard(x0, g, n):
     """Pollard's Rho algorithm.
-       With Pollard and Brent's improvement of computing gcd every 100 multiples.
+    With Pollard and Brent's improvement of computing gcd every 100 multiples.
 
     Args:
         x0 (int): Initial x.
@@ -37,12 +37,12 @@ def pollard(x0, g, n):
 
 def pollard2(x0, g, n):
     """Pollard's Rho algorithm.
-       With Brent's cycle finding method.
-       With Pollard and Brent's improvement of computing gcd every 100 multiples.
+    With Brent's cycle finding method.
+    With Pollard and Brent's improvement of computing gcd every 100 multiples.
 
     Args:
         x0 (int): Initial x.
-        g (int->int): A polynomial modulo n.
+        g (int->int): A function representing a polynomial modulo n.
         n (int): Number to be factored.
 
     Returns:

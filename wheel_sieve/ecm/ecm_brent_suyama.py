@@ -20,7 +20,7 @@ def apply_polynomial(coeff, x):
     """Given coefficients [a0, a1, ..., an] and x, compute f(x) = a0 + a1*x + ... + ai*x**i + ... an*x**n.
 
     Args:
-        coeff (list of int): Coefficients [a0, a1, ..., an].
+        coeff (list(int)): Coefficients [a0, a1, ..., an].
         x (int): Point x to on which to evaluate the polynomial.
 
     Returns:
@@ -41,13 +41,13 @@ def get_difference_seq(coeff, x0, d):
     for each term.
 
     Args:
-        coeff (list of int): Coefficients [a0, a1, ..., an].
+        coeff (list(int)): Coefficients [a0, a1, ..., an].
         x0 (int): Initial value of the arithmetic sequence {x0, x0+d, ...}.
         d (int): Common difference of the arithmetic sequence {x0, x0+d, ...}.
 
     Returns:
-        list of int: [d0, d1, ..., dn] where di is the first term of the i-th order difference sequence of
-            {f(x0), f(x0+d), f(x0+2d), ...}.
+        list(int): [d0, d1, ..., dn] where di is the first term of the i-th order difference sequence of
+        {f(x0), f(x0+d), f(x0+2d), ...}.
     """
     n = len(coeff)
     f = [apply_polynomial(coeff, x) for x in range(x0, x0 + n * d, d)]
@@ -65,7 +65,7 @@ def step_difference_seq_exn(pt_list, curve):
         InverseNotFound: Thrown when a term necessary for the calculation cannot be inverted.
 
     Args:
-        pt_list (list of point): List of points in XY form.
+        pt_list (list(point)): List of points in XY form.
         curve (curve): Curve in Weierstrass form.
     """
     a, b, n = curve
@@ -88,11 +88,12 @@ def step_difference_seq_exn(pt_list, curve):
 
 
 def ecm(n, rounds, b1, b2):
-    """Elliptic Curve Factorization Method.
-    For each round:
+    """Elliptic Curve Factorization Method. In each round, the following steps are performed:
+
         0. Generate random point and curve.
         1. Repeatedly multiply the current point by small primes raised to some power, determined by b1.
         2. Standard continuation on primes from b1 to b2 with Brent-Suyama's Extension.
+    
     Returns when a non-trivial factor is found.
 
     Args:

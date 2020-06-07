@@ -53,15 +53,17 @@ def inv(x, n):
 
 
 def init_wheel(b1, b2, wheel):
-    """Initialize Wheel. Generates:
-    j_list: list of j, where 1 <= j < wheel // 2 and j coprime to wheel.
-    prime_array: bitarray of whether each number in range [b1, b2) is a prime.
-        The entries are stored in 8-bit little-endian format.
-        With c1 = b1 // wheel, if either of n1 = c * wheel + j or n2 = c * wheel - j is prime,
+    """Initialize Wheel. Computes:
+
+     -  j_list: list of j, where 1 <= j < wheel // 2 and j coprime to wheel.
+     -  prime_array: bitarray of whether each number in range [b1, b2) is a prime.
+        The entries are stored in 8-bit little-endian format. With c1 = b1 // wheel, if either of n1 = c * wheel + j or n2 = c * wheel - j is prime,
         the following bit is set to 1:
-            axis 0: c - c1
-            axis 1: (index of j in j_list) // 8
-            bit # : (index of j in j_list) % 8
+
+         -  axis 0: c - c1
+         -  axis 1: (index of j in j_list) // 8
+         -  bit # : (index of j in j_list) % 8
+
 
     Args:
         b1 (int): Lower bound of prime range.
@@ -69,7 +71,7 @@ def init_wheel(b1, b2, wheel):
         wheel (int): Wheel. Typically primorial numbers like 30, 210, 2310.
 
     Returns:
-        tuple(list of int, np.array): (j_list, prime_array).
+        tuple(list(int), np.array): (j_list, prime_array).
     """
     j_list = [j for j in range(1, wheel // 2) if gcd(j, wheel) == 1]
     j_index = {j: i for i, j in enumerate(j_list)}
@@ -93,7 +95,7 @@ def inv_multi(element_list, n):
     instead of k modular inverses.
 
     Args:
-        element_list (list of int): List of elements to be inverted (mod n).
+        element_list (list(int)): List of elements to be inverted (mod n).
         n (int): Modulus.
 
     Returns:
@@ -135,8 +137,8 @@ def inv_power(x, d):
     x must be >= 0 and d must be >= 1.
 
     Args:
-        x (int): x.
-        d (int): d.
+        x (int): Integer x.
+        d (int): Integer d.
 
     Raises:
         ValueError: Thrown when x < 0 or d < 1.

@@ -79,13 +79,12 @@ def add_pt_exn(pt1, pt2, curve):
 
 def add_pt_gen(pt1, pt2, curve):
     """Adds two points pt1 and pt2 on curve. Returns a generator that generates exactly 2 elements.
-    Step 0:
-        Send None to start generator.
-    Step 1: 
-        Generator yields the number to be inverted (mod n), or None if no inversion is required.
-        Send the inverted number to generator, or None if no inversion is required.
-    Step 2:
-        Generator yields the point pt1 + pt2.
+    
+    Steps:
+     0.  Send None to start generator.
+     1.  Generator yields the number to be inverted (mod n), or None if no inversion is required.
+         Send the inverted number to generator, or None if no inversion is required.
+     2.  Generator yields the point pt1 + pt2.
 
     Args:
         pt1 (tuple(int, int)): Point (x1, y1). Use (None, None) for point at infinity.
@@ -94,6 +93,8 @@ def add_pt_gen(pt1, pt2, curve):
 
     Yields:
         int: The number to be inverted (mod n), or None if no inversion is required.
+
+    Yields:
         tuple(int, int): Point pt1+pt2.
     """
     x1, y1 = pt1
@@ -145,14 +146,13 @@ def mul_pt_exn(point, curve, k):
 
 def mul_pt_gen(point, curve, k):
     """Multiplies point by k times on curve. Returns a generator that generates multiple elements.
-    Step 0:
-        Send None to start generator.
-    Step 1: 
-        Generator yields the number to be inverted (mod n), or None if no inversion is required.
-        Send the inverted number to generator, or None if no inversion is required.
-        If the generator did not yield None, Repeat step 1.
-    Step 2:
-        Generator yields the point k * point.
+    
+    Steps:
+     0.  Send None to start generator.
+     1.  Generator yields the number to be inverted (mod n), or None if no inversion is required.
+         Send the inverted number to generator, or None if no inversion is required.
+         If the generator did not yield None, Repeat step 1.
+     2.  Generator yields the point k * point.
 
     Args:
         point (tuple(int, int)): Point (x, y). Use (None, None) for point at infinity.
@@ -161,7 +161,10 @@ def mul_pt_gen(point, curve, k):
 
     Yields:
         int: The number to be inverted (mod n), or None if no inversion is required.
+    
+    Yields:
         tuple(int, int): Point k * point.
+
     """
     if k < 0:
         yield from mul_pt_gen(neg_pt(point, curve), curve, -k)
@@ -230,11 +233,12 @@ def mul_pt_multi(point, curve, k_ls):
 
 
 def ecm(n, rounds, b1, b2):
-    """Elliptic Curve Factorization Method.
-    For each round:
+    """Elliptic Curve Factorization Method. In each round, the following steps are performed:
+
         0. Generate random point and curve.
         1. Repeatedly multiply the current point by small primes raised to some power, determined by b1.
         2. Repeatedly try to multiply the point from step 1 by possible primes (with wheel of 210) between b1 and b2.
+    
     Returns when a non-trivial factor is found.
 
     Args:

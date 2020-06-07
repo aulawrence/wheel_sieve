@@ -7,7 +7,7 @@ class Polynomial(object):
     """Polynomial. f(x) = a0 + a1*x + a2*x**2 + ... + ad*x**d (mod n).
 
     Args:
-        coeff (list of int): Coefficient list [a0, a1, a2, ..., ad].
+        coeff (list(int)): Coefficient list [a0, a1, a2, ..., ad].
         n (int): Modulus.
         copy (bool, optional): Make a copy of the coefficient list. Defaults to False.
     """
@@ -183,7 +183,7 @@ class Polynomial(object):
         return poly_rem
 
     def recip(self):
-        """Get the reciprocal polynomial. For f(x) of degree n, recip(f)(x) = floor( x^2n / f(x) ).
+        """Get the reciprocal polynomial. For f(x) of degree n, recip(f)(x) = :math:`\\lfloor{\\frac{x^{2n}}{f(x)}}\\rfloor`.
         Uses Montgomery's RECIP algorithm.
 
         Returns:
