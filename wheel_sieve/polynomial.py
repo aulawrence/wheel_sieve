@@ -22,10 +22,12 @@ class Polynomial(object):
         return self.coeff == other.coeff
 
     def __getitem__(self, slice_index):
-        """Slice the coefficient list by slice_index, then return the Polynomial with the resultant coefficient list.
+        """Slice the coefficient list by slice_index, then return the Polynomial with the
+        resultant coefficient list.
 
         Args:
-            slice_index (int or slice): Index to access, or slice to apply on the original coefficients list.
+            slice_index (int or slice): Index to access, or slice to apply on the original
+                coefficients list.
 
         Returns:
             Polynomial: Polynomial with coefficient list as indexed/ sliced.
@@ -183,7 +185,8 @@ class Polynomial(object):
         return poly_rem
 
     def recip(self):
-        """Get the reciprocal polynomial. For f(x) of degree n, recip(f)(x) = :math:`\\lfloor{\\frac{x^{2n}}{f(x)}}\\rfloor`.
+        """Get the reciprocal polynomial. For f(x) of degree n,
+        recip(f)(x) = :math:`\\lfloor{\\frac{x^{2n}}{f(x)}}\\rfloor`.
         Uses Montgomery's RECIP algorithm.
 
         Returns:

@@ -75,10 +75,6 @@ def pollard2(x0, g, n):
 
 
 if __name__ == "__main__":
-    n = 3176919178044924099992905369  # (41610855623299 * 76348326186931)
-    x = 2
-
-    def g(x):
-        return (x * x + 3) % n
-
-    print(pollard2(x, g, n))
+    num = 3176919178044924099992905369  # (41610855623299 * 76348326186931)
+    x_init = 2
+    print(pollard2(x_init, lambda x: (x * x + 3) % num, num))

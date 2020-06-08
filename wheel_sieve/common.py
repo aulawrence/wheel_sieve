@@ -57,7 +57,8 @@ def init_wheel(b1, b2, wheel):
 
      -  j_list: list of j, where 1 <= j < wheel // 2 and j coprime to wheel.
      -  prime_array: bitarray of whether each number in range [b1, b2) is a prime.
-        The entries are stored in 8-bit little-endian format. With c1 = b1 // wheel, if either of n1 = c * wheel + j or n2 = c * wheel - j is prime,
+        The entries are stored in 8-bit little-endian format. With c1 = b1 // wheel,
+        if either of n1 = c * wheel + j or n2 = c * wheel - j is prime,
         the following bit is set to 1:
 
          -  axis 0: c - c1
@@ -91,8 +92,8 @@ def init_wheel(b1, b2, wheel):
 
 def inv_multi(element_list, n):
     """Compute inverse (mod n) of multiple elements.
-    Uses Montgomery's trick so that for a list of length k, it only takes 1 modular inverse and O(k) modular multiplications
-    instead of k modular inverses.
+    Uses Montgomery's trick so that for a list of length k, it only takes 1 modular inverse and
+    O(k) modular multiplications instead of k modular inverses.
 
     Args:
         element_list (list(int)): List of elements to be inverted (mod n).

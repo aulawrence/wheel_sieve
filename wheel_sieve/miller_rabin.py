@@ -21,17 +21,22 @@ def powmod(x, r, n):
 
 def witness_uniform(n, k):
     """Choose k distinct numbers from the range [2, n-2] with equal weights.
-    Assuming k << n for large n. Fails when k >= sqrt(n) and n above int64 range, which is not practical anyways.
+    Assuming k << n for large n. Fails when k >= sqrt(n) and n above int64 range, which is not
+    practical anyways.
 
     Args:
         n (int): Number determining the range, n >= 4
         k (int): Number of elements to be selected, 1 <= k <= n - 3
 
+    Raises:
+        ValueError: Thrown when n < 4 or not 1 <= k <= n - 3.
+
     Returns:
         list(int): List of chosen numbers
     """
-    assert n >= 4
-    assert 1 <= k <= n - 3
+
+    if n < 4 or not 1 <= k <= n - 3:
+        raise ValueError
     if k < int(n ** 0.5):
         s = set()
         r = random.randint(2, n - 2)
@@ -96,7 +101,8 @@ def probable_primes(n, d, ubound, witness_list):
     Steps:
 
      1.  Sieve the list of multiples of primes in [1, ubound).
-     2.  Apply the Miller-Rabin Test with witness_list on the remaining values and yield the numbers passing the test.
+     2.  Apply the Miller-Rabin Test with witness_list on the remaining values and yield the
+         numbers passing the test.
 
     Args:
         n (int): Lower bound of range.
@@ -118,7 +124,7 @@ def probable_primes(n, d, ubound, witness_list):
 
 if __name__ == "__main__":
     random.seed(2)
-    d = 10000
-    n = random.randint(3 * 2 ** 2046, 2 ** 2048 - d - 1)
-    for v in probable_primes(n, d, 3000, witness_prime(1000)):
+    dist = 10000
+    num = random.randint(3 * 2 ** 2046, 2 ** 2048 - dist - 1)
+    for v in probable_primes(num, dist, 3000, witness_prime(1000)):
         print(v)

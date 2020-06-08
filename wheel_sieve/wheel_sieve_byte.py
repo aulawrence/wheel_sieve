@@ -69,11 +69,20 @@ def wheel_sieve_count(lbound, ubound, p_list=(2, 3, 5)):
         ubound (int): upper bound of range.
         p_list (tuple, optional): wheel primes. Defaults to (2, 3, 5).
 
+    Raises:
+        ValueError: Thrown when input is bad.
+
     Returns:
         int: number of primes in the range.
     """
-    assert isinstance(lbound, int) and isinstance(ubound, int) and 1 <= lbound <= ubound
-    assert all(isinstance(x, int) and x > 1 for x in p_list)
+    if (
+        not isinstance(lbound, int)
+        or not isinstance(ubound, int)
+        or not 1 <= lbound <= ubound
+    ):
+        raise ValueError
+    if not all(isinstance(x, int) and x > 1 for x in p_list):
+        raise ValueError
     PRIME_GEN.set_n(int(np.sqrt(ubound)) + 1)
     # wheel : product of primes in p_list
     # k_list : numbers from 1 to wheel coprime to wheel
@@ -113,11 +122,20 @@ def wheel_sieve(lbound, ubound, p_list=(2, 3, 5)):
         ubound (int): upper bound of range.
         p_list (tuple, optional): wheel primes. Defaults to (2, 3, 5).
 
+    Raises:
+        ValueError: Thrown when input is bad.
+
     Yields:
         int: primes in ascending order.
     """
-    assert isinstance(lbound, int) and isinstance(ubound, int) and 1 <= lbound <= ubound
-    assert all(isinstance(x, int) and x > 1 for x in p_list)
+    if (
+        not isinstance(lbound, int)
+        or not isinstance(ubound, int)
+        or not 1 <= lbound <= ubound
+    ):
+        raise ValueError
+    if not all(isinstance(x, int) and x > 1 for x in p_list):
+        raise ValueError
     PRIME_GEN.set_n(int(np.sqrt(ubound)) + 1)
     # wheel : product of primes in p_list
     # k_list : numbers from 1 to wheel coprime to wheel
@@ -173,12 +191,4 @@ def _wheel_sieve(lbound, ubound, wheel, k_list, kl_list):
 
 
 if __name__ == "__main__":
-    import time
-
-    START = time.time()
     print(wheel_sieve_count(1, 1_000_000_000))
-    # print(wheel_sieve_count(1,4_000_000_000))
-    # print(wheel_sieve_count(1, 1+60*10_000_000, (2,3,5,7,11)))
-    # print(wheel_sieve_count(2**45, 2**45+2**30))
-    END = time.time()
-    print(END - START)

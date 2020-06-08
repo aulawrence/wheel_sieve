@@ -81,7 +81,6 @@ class TestRecipTree(unittest.TestCase):
             )
             for _ in range(100)
         ]
-        target = product_loop(f_list)
         p_tree = product_tree(f_list, n)
         r_tree = recip_tree(p_tree)
         self.assertEqual(r_tree, [p.recip() for p in p_tree])

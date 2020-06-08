@@ -17,7 +17,7 @@ def factor_small_primes(n, ubound):
     Returns:
         tuple(dict, int): (prime_factors, x), where
 
-         -  **prime_factors** dict(int, int): mapping :math:`p_i` to :math:`d_{p_i}`.
+         -  **prime_factors** (dict(int, int)): mapping :math:`p_i` to :math:`d_{p_i}`.
          -  **x** (int): Integer x.
 
     """
@@ -56,7 +56,8 @@ def factor_ecm(n, ecm_kwargs_list, seed=None):
 
     Args:
         n (int): Number to be factored.
-        ecm_kwargs_list (list(dict)): List of dicts containing keyword arguments to be passed to ecm call.
+        ecm_kwargs_list (list(dict)): List of dicts containing keyword arguments to be passed to ecm
+            call.
         seed (int, optional): Random seed to be set every ecm call. Defaults to None.
 
     Returns:
@@ -71,14 +72,17 @@ def factor_ecm(n, ecm_kwargs_list, seed=None):
     return None
 
 
-def factorize(n, witness=witness_prime(100)):
-    """Factorize a number n, where n >= 2, with ECM into :math:`n = \\prod_{i} {p_i}^{d_{p_i}} * \\prod_{j} {f_j}^{d_{f_j}}`.
+def factorize(n, witness=None):
+    """Factorize a number n, where n >= 2, with ECM into
+    :math:`n = \\prod_{i} {p_i}^{d_{p_i}} * \\prod_{j} {f_j}^{d_{f_j}}`.
     Each :math:`p_i` passes the Miller Rabin Primality Test and is (probably) prime.
-    Each :math:`f_j` are known composite that cannot be factored because we try a fixed number of curves.
+    Each :math:`f_j` are known composite that cannot be factored because we try a fixed number
+    of curves.
 
     Args:
         n (int): Integer to factorize.
-        witness (list(int), optional): Witness to be used in Miller Rabin Primality Test. Defaults to witness_prime(100).
+        witness (list(int), optional): Witness to be used in Miller Rabin Primality Test.
+            Defaults to witness_prime(100).
 
     Raises:
         ValueError: Thrown when n < 2
@@ -86,12 +90,14 @@ def factorize(n, witness=witness_prime(100)):
     Returns:
         tuple(dict, dict): (prime_factors, remaining_factors), where
 
-         -  **prime_factors** dict(int, int): mapping :math:`p_i` to :math:`d_{p_i}`.
-         -  **remaining_factors** dict(int, int): mapping :math:`f_j` to :math:`d_{f_j}`.
-         
+         -  **prime_factors** (dict(int, int)): mapping :math:`p_i` to :math:`d_{p_i}`.
+         -  **remaining_factors** (dict(int, int)): mapping :math:`f_j` to :math:`d_{f_j}`.
+
     """
     if n < 2:
         raise ValueError
+    if witness is None:
+        witness = witness_prime(100)
     prime_factors, factor = factor_small_primes(n, 1033)
     if factor == 1:
         return prime_factors, dict()
