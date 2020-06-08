@@ -1,3 +1,5 @@
+"""Elliptic Curve Method using Wererstrass Curves.
+"""
 import random
 import time
 from math import gcd
@@ -14,10 +16,11 @@ def get_curve(pt0, a, n):
         n (int): Modulus.
 
     Returns:
-        tuple(int, int, int): (a, b, n) representing the Elliptic Curve y**2 = x**3 + a*x + b (mod n).
+        tuple(int, int, int): (a, b, n) representing the
+        Elliptic Curve y**2 = x**3 + a*x + b (mod n).
     """
     x0, y0 = pt0
-    b = (y0**2 - x0**3 - a * x0) % n
+    b = (y0 ** 2 - x0 ** 3 - a * x0) % n
     return (a, b, n)
 
 
@@ -25,13 +28,14 @@ def get_delta(curve):
     """Computes the discriminant (4 * a**3 + 27 * b**2) % n of the Elliptic Curve.
 
     Args:
-        curve (tuple(int, int, int)): (a, b, n) representing the Elliptic Curve y**2 = x**3 + a*x + b (mod n).
+        curve (tuple(int, int, int)): (a, b, n) representing the
+            Elliptic Curve y**2 = x**3 + a*x + b (mod n).
 
     Returns:
         int: The discriminant.
     """
     a, b, n = curve
-    delta = (4 * a**3 + 27 * b**2) % n
+    delta = (4 * a ** 3 + 27 * b ** 2) % n
     return gcd(delta, n) % n
 
 
@@ -40,7 +44,8 @@ def neg_pt(pt, curve):
 
     Args:
         pt (tuple(int, int)): Point (x, y). Use (None, None) for point at infinity.
-        curve (tuple(int, int, int)): (a, b, n) representing the Elliptic Curve y**2 = x**3 + a*x + b (mod n).
+        curve (tuple(int, int, int)): (a, b, n) representing the
+            Elliptic Curve y**2 = x**3 + a*x + b (mod n).
 
     Returns:
         tuple(int, int): Point -pt.
@@ -48,7 +53,7 @@ def neg_pt(pt, curve):
     if pt == (None, None):
         return (None, None)
     x, y = pt
-    a, b, n = curve
+    _a, _b, n = curve
     return (x, n - y)
 
 
@@ -58,7 +63,8 @@ def add_pt_exn(pt1, pt2, curve):
     Args:
         pt1 (tuple(int, int)): Point (x1, y1). Use (None, None) for point at infinity.
         pt2 (tuple(int, int)): Point (x2, y2). Use (None, None) for point at infinity.
-        curve (tuple(int, int, int)): (a, b, n) representing the Elliptic Curve y**2 = x**3 + a*x + b (mod n).
+        curve (tuple(int, int, int)): (a, b, n) representing the
+            Elliptic Curve y**2 = x**3 + a*x + b (mod n).
 
     Raises:
         InverseNotFound: Throws InverseNotFound when the sum is the point at infinity.
@@ -66,7 +72,7 @@ def add_pt_exn(pt1, pt2, curve):
     Returns:
         tuple(int, int): Point pt1 + pt2.
     """
-    a, b, n = curve
+    _a, _b, n = curve
     gen = add_pt_gen(pt1, pt2, curve)
     inv_req = gen.send(None)
     if inv_req is None:
@@ -77,26 +83,28 @@ def add_pt_exn(pt1, pt2, curve):
 
 def add_pt_gen(pt1, pt2, curve):
     """Adds two points pt1 and pt2 on curve. Returns a generator that generates exactly 2 elements.
-    Step 0:
-        Send None to start generator.
-    Step 1: 
-        Generator yields the number to be inverted (mod n), or None if no inversion is required.
-        Send the inverted number to generator, or None if no inversion is required.
-    Step 2:
-        Generator yields the point pt1 + pt2.
+
+    Steps:
+     0.  Send None to start generator.
+     1.  Generator yields the number to be inverted (mod n), or None if no inversion is required.
+         Send the inverted number to generator, or None if no inversion is required.
+     2.  Generator yields the point pt1 + pt2.
 
     Args:
         pt1 (tuple(int, int)): Point (x1, y1). Use (None, None) for point at infinity.
         pt2 (tuple(int, int)): Point (x2, y2). Use (None, None) for point at infinity.
-        curve (tuple(int, int, int)): (a, b, n) representing the Elliptic Curve y**2 = x**3 + a*x + b (mod n).
+        curve (tuple(int, int, int)): (a, b, n) representing the
+            Elliptic Curve y**2 = x**3 + a*x + b (mod n).
 
     Yields:
         int: The number to be inverted (mod n), or None if no inversion is required.
+
+    Yields:
         tuple(int, int): Point pt1+pt2.
     """
     x1, y1 = pt1
     x2, y2 = pt2
-    a, b, n = curve
+    a, _b, n = curve
     if pt1 == (None, None):
         yield None
         yield pt2
@@ -121,7 +129,8 @@ def mul_pt_exn(point, curve, k):
 
     Args:
         point (tuple(int, int)): Point (x, y). Use (None, None) for point at infinity.
-        curve (tuple(int, int, int)): (a, b, n) representing the Elliptic Curve y**2 = x**3 + a*x + b (mod n).
+        curve (tuple(int, int, int)): (a, b, n) representing the
+            Elliptic Curve y**2 = x**3 + a*x + b (mod n).
         k (int): Multiplier.
 
     Raises:
@@ -143,23 +152,26 @@ def mul_pt_exn(point, curve, k):
 
 def mul_pt_gen(point, curve, k):
     """Multiplies point by k times on curve. Returns a generator that generates multiple elements.
-    Step 0:
-        Send None to start generator.
-    Step 1: 
-        Generator yields the number to be inverted (mod n), or None if no inversion is required.
-        Send the inverted number to generator, or None if no inversion is required.
-        If the generator did not yield None, Repeat step 1.
-    Step 2:
-        Generator yields the point k * point.
+
+    Steps:
+     0.  Send None to start generator.
+     1.  Generator yields the number to be inverted (mod n), or None if no inversion is required.
+         Send the inverted number to generator, or None if no inversion is required.
+         If the generator did not yield None, Repeat step 1.
+     2.  Generator yields the point k * point.
 
     Args:
         point (tuple(int, int)): Point (x, y). Use (None, None) for point at infinity.
-        curve (tuple(int, int, int)): (a, b, n) representing the Elliptic Curve y**2 = x**3 + a*x + b (mod n).
+        curve (tuple(int, int, int)): (a, b, n) representing the
+            Elliptic Curve y**2 = x**3 + a*x + b (mod n).
         k (int): Multiplier.
 
     Yields:
         int: The number to be inverted (mod n), or None if no inversion is required.
+
+    Yields:
         tuple(int, int): Point k * point.
+
     """
     if k < 0:
         yield from mul_pt_gen(neg_pt(point, curve), curve, -k)
@@ -192,7 +204,8 @@ def mul_pt_multi(point, curve, k_ls):
 
     Args:
         point (tuple(int, int)): Point (x, y). Use (None, None) for point at infinity.
-        curve (tuple(int, int, int)): (a, b, n) representing the Elliptic Curve y**2 = x**3 + a*x + b (mod n).
+        curve (tuple(int, int, int)): (a, b, n) representing the
+            Elliptic Curve y**2 = x**3 + a*x + b (mod n).
         k_ls (list of int): List of multiplier.
 
     Raises:
@@ -201,7 +214,7 @@ def mul_pt_multi(point, curve, k_ls):
     Returns:
         list of tuple(int, int): List of points [k * point for k in k_ls].
     """
-    a, b, n = curve
+    _a, _b, n = curve
     gen_list = [mul_pt_gen(point, curve, k) for k in k_ls]
     denom_list = [gen.send(None) for gen in gen_list]
     working_set = set()
@@ -228,11 +241,14 @@ def mul_pt_multi(point, curve, k_ls):
 
 
 def ecm(n, rounds, b1, b2):
-    """Elliptic Curve Factorization Method.
-    For each round:
+    """Elliptic Curve Factorization Method. In each round, the following steps are performed:
+
         0. Generate random point and curve.
-        1. Repeatedly multiply the current point by small primes raised to some power, determined by b1.
-        2. Repeatedly try to multiply the point from step 1 by possible primes (with wheel of 210) between b1 and b2.
+        1. Repeatedly multiply the current point by small primes raised to some power, determined
+           by b1.
+        2. Repeatedly try to multiply the point from step 1 by possible primes (with wheel of 210)
+           between b1 and b2.
+
     Returns when a non-trivial factor is found.
 
     Args:
@@ -315,5 +331,5 @@ def ecm(n, rounds, b1, b2):
 
 if __name__ == "__main__":
     random.seed(2)
-    n = 310739457793333465418548557523014289  # (413198756866051421 * 752033864163021509)
-    print(ecm(n, 100, 10000, 800000))
+    num = 310739457793333465418548557523014289  # (413198756866051421 * 752033864163021509)
+    print(ecm(num, 100, 10000, 800000))

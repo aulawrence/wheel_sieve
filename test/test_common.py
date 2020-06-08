@@ -14,9 +14,9 @@ class TestECMCommon(unittest.TestCase):
         n = 65537 * 65539
         element_list = range(60000, 65538)
         with self.assertRaises(InverseNotFound) as cm_target:
-            target = {element: inv(element, n) for element in element_list}
+            _target = {element: inv(element, n) for element in element_list}
         with self.assertRaises(InverseNotFound) as cm_actual:
-            actual = inv_multi(element_list, n)
+            _actual = inv_multi(element_list, n)
         self.assertEqual(gcd(cm_target.exception.x, n), 65537)
         self.assertEqual(gcd(cm_actual.exception.x, n), 65537)
 

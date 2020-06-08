@@ -1,6 +1,11 @@
 import random
 import unittest
-from wheel_sieve.ecm.ecm_polyeval import Polynomial, product_tree, recip_tree, remainder_tree
+from wheel_sieve.ecm.ecm_polyeval import (
+    Polynomial,
+    product_tree,
+    recip_tree,
+    remainder_tree,
+)
 
 
 def product_loop(f_list):
@@ -40,7 +45,12 @@ class TestProductTree(unittest.TestCase):
     def test3(self):
         random.seed(2)
         n = 310739457793333465418548557523014289
-        f_list = [Polynomial([random.randint(0, n - 1) for _ in range(random.randint(1, 5))], n) for _ in range(100)]
+        f_list = [
+            Polynomial(
+                [random.randint(0, n - 1) for _ in range(random.randint(1, 5))], n
+            )
+            for _ in range(100)
+        ]
         target = product_loop(f_list)
         p_tree = product_tree(f_list, n)
         self.assertEqual(target, p_tree[0])
@@ -65,8 +75,12 @@ class TestRecipTree(unittest.TestCase):
     def test3(self):
         random.seed(2)
         n = 310739457793333465418548557523014289
-        f_list = [Polynomial([random.randint(0, n - 1) for _ in range(random.randint(1, 5))], n) for _ in range(100)]
-        target = product_loop(f_list)
+        f_list = [
+            Polynomial(
+                [random.randint(0, n - 1) for _ in range(random.randint(1, 5))], n
+            )
+            for _ in range(100)
+        ]
         p_tree = product_tree(f_list, n)
         r_tree = recip_tree(p_tree)
         self.assertEqual(r_tree, [p.recip() for p in p_tree])

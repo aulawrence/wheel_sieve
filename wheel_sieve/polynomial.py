@@ -1,3 +1,5 @@
+"""Polynomial arithmetic (mod n).
+"""
 from gmpy2 import mpz, xmpz
 from wheel_sieve.common import inv
 
@@ -6,7 +8,7 @@ class Polynomial(object):
     """Polynomial. f(x) = a0 + a1*x + a2*x**2 + ... + ad*x**d (mod n).
 
     Args:
-        coeff (list of int): Coefficient list [a0, a1, a2, ..., ad].
+        coeff (list(int)): Coefficient list [a0, a1, a2, ..., ad].
         n (int): Modulus.
         copy (bool, optional): Make a copy of the coefficient list. Defaults to False.
     """
@@ -21,10 +23,12 @@ class Polynomial(object):
         return self.coeff == other.coeff
 
     def __getitem__(self, slice_index):
-        """Slice the coefficient list by slice_index, then return the Polynomial with the resultant coefficient list.
+        """Slice the coefficient list by slice_index, then return the Polynomial with the
+        resultant coefficient list.
 
         Args:
-            slice_index (int or slice): Index to access, or slice to apply on the original coefficients list.
+            slice_index (int or slice): Index to access, or slice to apply on the original
+                coefficients list.
 
         Returns:
             Polynomial: Polynomial with coefficient list as indexed/ sliced.
@@ -129,7 +133,9 @@ class Polynomial(object):
                 quo = (dividend[d:] * other_recip)[d:]
                 poly_quo += quo
                 rem = dividend - quo * other
-                if len(rem.coeff) < len(other.coeff) or (len(rem.coeff) == 1 and rem.coeff[0] == 0):
+                if len(rem.coeff) < len(other.coeff) or (
+                    len(rem.coeff) == 1 and rem.coeff[0] == 0
+                ):
                     break
                 dividend = rem
             poly_rem = rem
@@ -160,14 +166,17 @@ class Polynomial(object):
             while True:
                 quo = (dividend[d:] * other_recip)[d:]
                 rem = dividend - quo * other
-                if len(rem.coeff) < len(other.coeff) or (len(rem.coeff) == 1 and rem.coeff[0] == 0):
+                if len(rem.coeff) < len(other.coeff) or (
+                    len(rem.coeff) == 1 and rem.coeff[0] == 0
+                ):
                     break
                 dividend = rem
             poly_rem = rem
         return poly_rem
 
     def recip(self):
-        """Get the reciprocal polynomial. For f(x) of degree n, recip(f)(x) = floor( x^2n / f(x) ).
+        """Get the reciprocal polynomial. For f(x) of degree n,
+        recip(f)(x) = :math:`\\lfloor{\\frac{x^{2n}}{f(x)}}\\rfloor`.
         Uses Montgomery's RECIP algorithm.
 
         Returns:
@@ -180,7 +189,9 @@ class Polynomial(object):
         k = 2
         while k < d * 2:
             R_prev = R_curr
-            H = (R_prev * R_prev) * Polynomial([self.coeff[d - k + j + 1] for j in range(k)], self.n)
+            H = (R_prev * R_prev) * Polynomial(
+                [self.coeff[d - k + j + 1] for j in range(k)], self.n
+            )
             R_curr_coeff = [0 for _ in range(k // 2)]
             for ai in R_prev.coeff:
                 R_curr_coeff.append(2 * ai)
@@ -191,11 +202,15 @@ class Polynomial(object):
             if k == 2:
                 e_curr = (e_prev * e_prev - self.coeff[d - k] * inv_fn) % self.n
             elif k <= d:
-                e_curr = (e_prev * e_prev - H.coeff[k - 3] * self.coeff[d] - self.coeff[d - k] * inv_fn) % self.n
+                e_curr = (
+                    e_prev * e_prev
+                    - H.coeff[k - 3] * self.coeff[d]
+                    - self.coeff[d - k] * inv_fn
+                ) % self.n
             k *= 2
         res = R_curr
         if k == d * 2:
             # Only needed when k is a power of 2.
             res.coeff.insert(0, e_curr * inv_fn % self.n)
-        res.coeff = res.coeff[-d - 1:]
+        res.coeff = res.coeff[-d - 1 :]
         return res

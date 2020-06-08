@@ -1,3 +1,5 @@
+"""Prime sieve with wheel factorization. Uses bitarray.
+"""
 import numpy as np
 from wheel_sieve.wheel_sieve_byte import PRIME_GEN
 
@@ -13,11 +15,20 @@ def wheel_sieve_count(lbound, ubound, p_list=(2, 3, 5)):
         ubound (int): upper bound of range.
         p_list (tuple, optional): wheel primes. Defaults to (2, 3, 5).
 
+    Raises:
+        ValueError: Thrown when input is bad.
+
     Returns:
         int: number of primes in the range.
     """
-    assert isinstance(lbound, int) and isinstance(ubound, int) and 1 <= lbound <= ubound
-    assert all(isinstance(x, int) and x > 1 for x in p_list)
+    if (
+        not isinstance(lbound, int)
+        or not isinstance(ubound, int)
+        or not 1 <= lbound <= ubound
+    ):
+        raise ValueError
+    if not all(isinstance(x, int) and x > 1 for x in p_list):
+        raise ValueError
     PRIME_GEN.set_n(int(np.sqrt(ubound)) + 1)
     # wheel : product of primes in p_list
     # k_list : numbers from 1 to wheel coprime to wheel
@@ -25,7 +36,11 @@ def wheel_sieve_count(lbound, ubound, p_list=(2, 3, 5)):
     wheel = 1
     for wheel_prime in p_list:
         wheel *= wheel_prime
-    k_list = [k for k in range(1, wheel) if all(k % wheel_prime != 0 for wheel_prime in p_list)]
+    k_list = [
+        k
+        for k in range(1, wheel)
+        if all(k % wheel_prime != 0 for wheel_prime in p_list)
+    ]
     kl_list = {k: [k_list.index(k * l % wheel) for l in k_list] for k in k_list}
     # Count primes between lbound and max(p_list)
     count = 0
@@ -70,6 +85,7 @@ CLEAR_BIT_FROM = (
 
 # [sum(c == "1" for c in "{:>08}".format(bin(np.uint8(x))[2:])) for x in range(256)]
 
+# fmt: off
 BIT_COUNT = np.array([
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
@@ -88,6 +104,7 @@ BIT_COUNT = np.array([
     3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
     4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
 ])
+# fmt: on
 
 
 def _wheel_sieve_bit(lbound, ubound, wheel, k_list, kl_list):
@@ -125,11 +142,4 @@ def _wheel_sieve_bit(lbound, ubound, wheel, k_list, kl_list):
 
 
 if __name__ == "__main__":
-    import time
-    START = time.time()
     print(wheel_sieve_count(1, 1_000_000_000))
-    # print(wheel_sieve_count(1,4_000_000_000))
-    # print(wheel_sieve_count(1, 1+60*10_000_000, (2,3,5,7,11)))
-    # print(wheel_sieve_count(2**45, 2**45+2**30))
-    END = time.time()
-    print(END - START)
